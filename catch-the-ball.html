@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>抓小球小游戏</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #FFF8DC;            /* 浅黄色背景 */
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Microsoft YaHei", sans-serif;
+    user-select: none;
+}
+
+/* ===== 顶部信息栏 ===== */
+#yqh_topBar {
+    height: 48px;
+    background: #333;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 0 20px;
+    font-size: 18px;
+    position: relative;
+    z-index: 50;
+}
+/* 返回首页链接 */
+.yqh_homeLink {
+    margin-left: auto;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+.yqh_homeLink:hover { color: #1e90ff; }
+/* 倒计时最后 10 秒：红色 + 抖动 */
+#yqh_time.yqh_danger {
+    color: #FF4444;
+    font-weight: bold;
+    animation: yqh_shake 0.2s infinite;
+}
+@keyframes yqh_shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-2px); }
+    75%      { transform: translateX(2px); }
+}
+
+/* ===== 开始按钮 ===== */
+#yqh_startBtn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 48px;
+    font-size: 24px;
+    border: none;
+    border-radius: 8px;
+    background: #1e90ff;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 20;
+}
+#yqh_startBtn:hover { background: #1a7de0; }
+
+/* ===== 小球 ===== */
+.yqh_ball {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1e90ff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 10;
+}
+/* 点中时的缩小淡出动画 */
+.yqh_ball.yqh_hit {
+    transform: scale(0);
+    opacity: 0;
+}
+
+/* ===== 加分/扣分飘字 ===== */
+.yqh_float-text {
+    position: fixed;
+    font-size: 22px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 60;
+    transform: translate(-50%, -100%);
+    animation: yqh_floatUp 0.8s ease-out forwards;
+}
+@keyframes yqh_floatUp {
+    from { opacity: 1; margin-top: 0; }
+    to   { opacity: 0; margin-top: -40px; }
+}
+
+/* ===== 点空白背景闪红 ===== */
+body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
+@keyframes yqh_flashRed {
+    0%   { background-color: #FFF8DC; }
+    50%  { background-color: #FFE4E4; }
+    100% { background-color: #FFF8DC; }
+}
+
+/* ===== 游戏结束遮罩 ===== */
+#yqh_overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    color: #fff;
+    z-index: 100;
+}
+#yqh_overlay.yqh_hidden { display: none; }
+#yqh_overlay h1 { font-size: 48px; }
+#yqh_overlay p  { font-size: 26px; }
+#yqh_restartBtn {
+    padding: 12px 40px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    background: #32CD32;
+    color: #fff;
+    cursor: pointer;
+}
+#yqh_restartBtn:hover { background: #2ab52a; }
+</style>
+</head>
+<body>
+    <div id="yqh_topBar">
+        <div>分数：<span id="yqh_score">0</span></div>
+        <div>⏱ 剩余时间：<span id="yqh_time">2:00</span></div>
+        <a class="yqh_homeLink" href="index.html">← 返回首页</a>
+    </div>
+
+    <button id="yqh_startBtn">开始游戏</button>
+
+    <div id="yqh_overlay" class="yqh_hidden">
+        <h1>🎉 Game Over</h1>
+        <p>最终分数：<span id="yqh_finalScore">0</span></p>
+        <button id="yqh_restartBtn">再来一局</button>
+    </div>
+
+    <script>
+        // ===== 游戏常量（规则：所有 JS 变量以 yqh_ 开头） =====
+        const yqh_ballSize = 60;        // 小球直径
+        const yqh_ballTimeout = 3000;   // 3秒未点自动刷新
+        const yqh_topBarHeight = 48;    // 顶栏高度
+        const yqh_gameDuration = 120;   // 2分钟 = 120秒
+
+        // ===== 游戏状态变量 =====
+        let yqh_state = 'idle';         // 'idle' | 'playing' | 'ended'
+        let yqh_score = 0;
+        let yqh_timeLeft = yqh_gameDuration;
+        let yqh_balls = [];             // [{ yqh_id, yqh_dom, yqh_x, yqh_y, yqh_timeoutId }]
+        let yqh_nextId = 1;
+        let yqh_countdownTimer = null;
+
+        // ===== DOM 引用 =====
+        let yqh_scoreEl = null;
+        let yqh_timeEl = null;
+        let yqh_startBtn = null;
+        let yqh_restartBtn = null;
+        let yqh_overlayEl = null;
+        let yqh_finalScoreEl = null;
+
+        // ===== 初始化 =====
+        function yqh_init() {
+            yqh_scoreEl = document.getElementById('yqh_score');
+            yqh_timeEl = document.getElementById('yqh_time');
+            yqh_startBtn = document.getElementById('yqh_startBtn');
+            yqh_restartBtn = document.getElementById('yqh_restartBtn');
+            yqh_overlayEl = document.getElementById('yqh_overlay');
+            yqh_finalScoreEl = document.getElementById('yqh_finalScore');
+
+            yqh_startBtn.addEventListener('click', function (yqh_e) {
+                yqh_e.stopPropagation(); // 开始按钮的点击不算"点空白"
+                yqh_startGame();
+            });
+            yqh_restartBtn.addEventListener('click', function (yqh_e) {
+                yqh_e.stopPropagation();
+                yqh_restartGame();
+            });
+            // 点击空白区域扣分（点中小球时会 stopPropagation，不会走到这里）
+            document.body.addEventListener('click', yqh_handleMissClick);
+            // 窗口大小变化时，让所有小球回到安全位置
+            window.addEventListener('resize', yqh_handleResize);
+        }
+
+        // ===== 游戏流程 =====
+        function yqh_startGame() {
+            yqh_state = 'playing';
+            yqh_score = 0;
+            yqh_timeLeft = yqh_gameDuration;
+            yqh_startBtn.style.display = 'none';
+            yqh_overlayEl.classList.add('yqh_hidden');
+            yqh_updateScore();
+            yqh_updateTime();
+            // 初始随机生成 1~3 个小球
+            yqh_fillBalls(Math.floor(Math.random() * 3) + 1);
+            yqh_startCountdown();
+        }
+
+        function yqh_restartGame() {
+            yqh_clearAllBalls();   // 保险：清掉任何残留小球和计时器
+            yqh_startGame();
+        }
+
+        function yqh_endGame() {
+            yqh_state = 'ended';
+            yqh_stopCountdown();
+            yqh_clearAllBalls();   // 清除所有小球及其 3 秒计时器，防止"幽灵球"
+            yqh_timeEl.classList.remove('yqh_danger');
+            yqh_finalScoreEl.innerText = yqh_score;
+            yqh_overlayEl.classList.remove('yqh_hidden');
+        }
+
+        function yqh_startCountdown() {
+            yqh_stopCountdown();
+            yqh_countdownTimer = setInterval(function () {
+                yqh_timeLeft--;
+                yqh_updateTime();
+                if (yqh_timeLeft <= 0) {
+                    yqh_endGame();
+                }
+            }, 1000);
+        }
+
+        function yqh_stopCountdown() {
+            if (yqh_countdownTimer) {
+                clearInterval(yqh_countdownTimer);
+                yqh_countdownTimer = null;
+            }
+        }
+
+        // ===== 小球管理 =====
+        // 补充小球直到数量达到目标（只增不删）
+        function yqh_fillBalls(yqh_target) {
+            while (yqh_balls.length < yqh_target) {
+                yqh_createBall();
+            }
+        }
+
+        function yqh_createBall() {
+            const yqh_pos = yqh_getSafePosition();
+            const yqh_div = document.createElement('div');
+            yqh_div.className = 'yqh_ball';
+            yqh_div.style.left = yqh_pos.yqh_x + 'px';
+            yqh_div.style.top = yqh_pos.yqh_y + 'px';
+            document.body.appendChild(yqh_div);
+
+            const yqh_ball = {
+                yqh_id: yqh_nextId++,
+                yqh_dom: yqh_div,
+                yqh_x: yqh_pos.yqh_x,
+                yqh_y: yqh_pos.yqh_y,
+                yqh_timeoutId: null
+            };
+
+            // 点击小球
+            yqh_div.addEventListener('click', function (yqh_e) {
+                yqh_e.stopPropagation(); // 不触发"点空白扣分"
+                yqh_hitBall(yqh_ball.yqh_id, yqh_e);
+            });
+
+            // 3 秒未点击 → 自动消失并刷新
+            yqh_ball.yqh_timeoutId = setTimeout(function () {
+                yqh_timeoutBall(yqh_ball.yqh_id);
+            }, yqh_ballTimeout);
+
+            yqh_balls.push(yqh_ball);
+        }
+
+        // 点中小球：+2 分
+        function yqh_hitBall(yqh_id, yqh_e) {
+            if (yqh_state !== 'playing') return;
+            const yqh_ball = yqh_findBall(yqh_id);
+            if (!yqh_ball) return; // 已被处理，防止重复计分
+
+            // 逻辑层先移除，避免重复计分
+            yqh_balls = yqh_balls.filter(function (yqh_b) { return yqh_b.yqh_id !== yqh_id; });
+            clearTimeout(yqh_ball.yqh_timeoutId);
+
+            yqh_score += 2;
+            yqh_updateScore();
+            yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '+2', '#32CD32');
+
+            // 表现层：缩小淡出动画后再移除 DOM
+            yqh_ball.yqh_dom.classList.add('yqh_hit');
+            setTimeout(function () { yqh_ball.yqh_dom.remove(); }, 300);
+
+            // 1:1 补一个新球，总数保持不变
+            yqh_fillBalls(yqh_balls.length + 1);
+        }
+
+        // 3 秒超时：小球自动消失，总数重新随机 1~3
+        function yqh_timeoutBall(yqh_id) {
+            if (yqh_state !== 'playing') return;
+            const yqh_ball = yqh_findBall(yqh_id);
+            if (!yqh_ball) return; // 已被点击移除
+
+            yqh_ball.yqh_dom.remove();
+            yqh_balls = yqh_balls.filter(function (yqh_b) { return yqh_b.yqh_id !== yqh_id; });
+
+            // 只有超时刷新才重新随机总数，带来玩法变化
+            yqh_fillBalls(Math.floor(Math.random() * 3) + 1);
+        }
+
+        // 清除所有小球：先 clearTimeout 再移除 DOM，防止残留计时器
+        function yqh_clearAllBalls() {
+            yqh_balls.forEach(function (yqh_b) {
+                clearTimeout(yqh_b.yqh_timeoutId);
+                yqh_b.yqh_dom.remove();
+            });
+            yqh_balls = [];
+        }
+
+        function yqh_findBall(yqh_id) {
+            return yqh_balls.find(function (yqh_b) { return yqh_b.yqh_id === yqh_id; });
+        }
+
+        // ===== 位置计算 =====
+        // 生成一个避开顶栏、互不重叠的随机位置
+        function yqh_getSafePosition() {
+            const yqh_maxX = Math.max(1, window.innerWidth - yqh_ballSize);
+            const yqh_minY = yqh_topBarHeight;
+            const yqh_maxY = Math.max(yqh_minY + 1, window.innerHeight - yqh_ballSize);
+            let yqh_x = 0, yqh_y = yqh_minY, yqh_tries = 0;
+            do {
+                yqh_x = Math.floor(Math.random() * yqh_maxX);
+                yqh_y = yqh_minY + Math.floor(Math.random() * (yqh_maxY - yqh_minY));
+                yqh_tries++;
+            } while (yqh_isColliding(yqh_x, yqh_y) && yqh_tries < 100);
+            return { yqh_x: yqh_x, yqh_y: yqh_y };
+        }
+
+        // 与现有小球圆心距离是否小于直径
+        function yqh_isColliding(yqh_x, yqh_y) {
+            const yqh_cx = yqh_x + yqh_ballSize / 2;
+            const yqh_cy = yqh_y + yqh_ballSize / 2;
+            for (let yqh_i = 0; yqh_i < yqh_balls.length; yqh_i++) {
+                const yqh_b = yqh_balls[yqh_i];
+                const yqh_dx = yqh_cx - (yqh_b.yqh_x + yqh_ballSize / 2);
+                const yqh_dy = yqh_cy - (yqh_b.yqh_y + yqh_ballSize / 2);
+                if (Math.sqrt(yqh_dx * yqh_dx + yqh_dy * yqh_dy) < yqh_ballSize) return true;
+            }
+            return false;
+        }
+
+        // ===== 点击空白：-1 分 =====
+        function yqh_handleMissClick(yqh_e) {
+            if (yqh_state !== 'playing') return;
+            yqh_score = Math.max(0, yqh_score - 1); // 保底 0 分
+            yqh_updateScore();
+            yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '-1', '#FF4444');
+
+            // 背景闪红 200ms
+            document.body.classList.remove('yqh_flash-red');
+            void document.body.offsetWidth; // 强制重绘，让动画可以连续触发
+            document.body.classList.add('yqh_flash-red');
+            setTimeout(function () {
+                document.body.classList.remove('yqh_flash-red');
+            }, 200);
+        }
+
+        // ===== 渲染与工具 =====
+        function yqh_updateScore() {
+            yqh_scoreEl.innerText = yqh_score;
+        }
+
+        function yqh_updateTime() {
+            yqh_timeEl.innerText = yqh_formatTime(yqh_timeLeft);
+            // 最后 10 秒变红抖动
+            yqh_timeEl.classList.toggle('yqh_danger', yqh_timeLeft <= 10 && yqh_state === 'playing');
+        }
+
+        // 秒数 → M:SS 格式
+        function yqh_formatTime(yqh_seconds) {
+            const yqh_m = Math.floor(yqh_seconds / 60);
+            const yqh_s = yqh_seconds % 60;
+            return yqh_m + ':' + (yqh_s < 10 ? '0' + yqh_s : yqh_s);
+        }
+
+        // 在点击位置生成飘字，800ms 后移除
+        function yqh_showFloatingText(yqh_x, yqh_y, yqh_text, yqh_color) {
+            const yqh_el = document.createElement('div');
+            yqh_el.className = 'yqh_float-text';
+            yqh_el.innerText = yqh_text;
+            yqh_el.style.left = yqh_x + 'px';
+            yqh_el.style.top = yqh_y + 'px';
+            yqh_el.style.color = yqh_color;
+            document.body.appendChild(yqh_el);
+            setTimeout(function () { yqh_el.remove(); }, 800);
+        }
+
+        // 窗口缩放后重新给所有小球安排安全位置
+        function yqh_handleResize() {
+            if (yqh_state !== 'playing') return;
+            yqh_balls.forEach(function (yqh_b) {
+                const yqh_pos = yqh_getSafePosition();
+                yqh_b.yqh_x = yqh_pos.yqh_x;
+                yqh_b.yqh_y = yqh_pos.yqh_y;
+                yqh_b.yqh_dom.style.left = yqh_pos.yqh_x + 'px';
+                yqh_b.yqh_dom.style.top = yqh_pos.yqh_y + 'px';
+            });
+        }
+
+        // 启动
+        yqh_init();
+    </script>
+</body>
+</html>

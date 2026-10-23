@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>勾线 · Lucide 矢量图标 | 字·线 图标工坊</title>
+<!-- Lucide · 本地 SVG 方案：lucide.min.js 把 data-lucide 占位元素替换成真正的内联 SVG -->
+<script src="cdn/lucide/lucide.min.js"></script>
+<style>
+  /* ========== 卷二「勾线」设计令牌：雾纸 × 炭墨 × 青瓷 × 藤黄 × 靛蓝 ========== */
+  :root{
+    --yqh_mist:#F2F3F0;         /* 雾纸底 */
+    --yqh_char:#1F2326;         /* 炭墨 */
+    --yqh_jade:#2E6E5E;         /* 青瓷 主色 */
+    --yqh_amber:#D9952B;        /* 藤黄 点睛 */
+    --yqh_navy:#35507A;         /* 靛蓝 辅 */
+    --yqh_line:rgba(31,35,38,.15);
+    --yqh_stroke_color:var(--yqh_char);   /* 描边实验台的当前颜色 */
+    --yqh_disp:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    --yqh_body:"Microsoft YaHei","PingFang SC",sans-serif;
+    --yqh_mono:"Consolas","Courier New",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--yqh_mist);color:var(--yqh_char);
+    font-family:var(--yqh_body);line-height:1.7;
+  }
+  ::selection{background:var(--yqh_jade);color:var(--yqh_mist)}
+
+  /* ========== 顶栏 ========== */
+  .yqh_top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px clamp(20px,6vw,72px);
+    border-bottom:2px solid var(--yqh_char);
+  }
+  .yqh_brand{
+    font-family:var(--yqh_disp);font-weight:800;font-size:20px;
+    letter-spacing:.06em;color:var(--yqh_char);text-decoration:none;
+  }
+  .yqh_brand b{color:var(--yqh_jade)}
+  .yqh_vol{
+    font-size:13px;color:var(--yqh_jade);font-weight:700;
+    border:2px solid var(--yqh_jade);padding:2px 12px;margin-left:14px;
+    vertical-align:3px;letter-spacing:.2em;
+  }
+  .yqh_home{
+    color:var(--yqh_char);text-decoration:none;font-size:14px;font-weight:700;
+    border-bottom:3px solid var(--yqh_amber);padding-bottom:2px;
+  }
+  .yqh_home:hover{color:var(--yqh_jade)}
+  .yqh_home:focus-visible,.yqh_chip:focus-visible,.yqh_stroke:focus-visible{
+    outline:2px solid var(--yqh_jade);outline-offset:3px}
+
+  /* ========== 主视觉：一枚被当场画出的罗盘 ========== */
+  .yqh_hero{
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(28px,6vw,88px);
+    align-items:center;
+    padding:clamp(48px,9vh,110px) clamp(20px,6vw,72px) clamp(40px,7vh,80px);
+  }
+  .yqh_hero_stage{
+    width:clamp(150px,22vw,230px);height:clamp(150px,22vw,230px);
+    display:grid;place-items:center;
+    background:var(--yqh_char);color:var(--yqh_mist);
+    border-radius:50% 50% 50% 4px;             /* 制图规仪的一角切平 */
+    box-shadow:10px 10px 0 var(--yqh_amber);
+  }
+  .yqh_hero_stage svg{width:58%;height:58%}
+  .yqh_h1{
+    font-family:var(--yqh_disp);font-weight:900;
+    font-size:clamp(40px,7vw,88px);line-height:1.12;letter-spacing:-.01em;
+  }
+  .yqh_h1 small{
+    display:block;font-size:.3em;font-weight:700;letter-spacing:.42em;
+    color:var(--yqh_jade);margin-bottom:10px;
+  }
+  .yqh_lede{
+    max-width:34em;margin-top:18px;font-size:clamp(15px,1.6vw,18px);
+    color:rgba(31,35,38,.82);
+  }
+  .yqh_lede code{
+    font-family:var(--yqh_mono);font-size:.9em;background:rgba(46,110,94,.12);
+    padding:2px 7px;border-radius:4px;color:var(--yqh_jade);
+  }
+
+  /* ========== 分区通用 ========== */
+  .yqh_section{padding:clamp(36px,6vh,64px) clamp(20px,6vw,72px)}
+  .yqh_section>h2{
+    font-family:var(--yqh_disp);font-weight:900;
+    font-size:clamp(24px,3.2vw,36px);letter-spacing:.02em;
+    display:flex;align-items:baseline;gap:16px;
+  }
+  .yqh_section>h2::after{
+    content:"";flex:1;height:3px;background:var(--yqh_char);transform:translateY(-6px)}
+  .yqh_section>p.yqh_note{max-width:36em;margin:10px 0 26px;color:rgba(31,35,38,.72)}
+
+  /* ========== 描边实验台 ========== */
+  .yqh_lab{
+    border:2px solid var(--yqh_char);background:rgba(255,255,255,.55);
+    padding:clamp(18px,3vw,32px);
+  }
+  .yqh_lab_bar{
+    display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-bottom:8px;
+  }
+  .yqh_lab_bar label{font-weight:700;font-size:14px;letter-spacing:.1em}
+  .yqh_stroke{accent-color:var(--yqh_jade);width:min(260px,50vw)}
+  .yqh_stroke_val{
+    font-family:var(--yqh_mono);font-size:14px;color:var(--yqh_jade);
+    border:1.5px solid var(--yqh_jade);padding:2px 10px;min-width:64px;text-align:center;
+  }
+  .yqh_chips{display:flex;gap:10px;margin-left:auto}
+  .yqh_chip{
+    width:30px;height:30px;border-radius:50%;border:2px solid var(--yqh_char);
+    cursor:pointer;transition:transform .15s ease;
+  }
+  .yqh_chip:hover{transform:scale(1.14)}
+  .yqh_chip[aria-pressed="true"]{box-shadow:0 0 0 3px var(--yqh_mist),0 0 0 5px var(--yqh_char)}
+  .yqh_lab_hint{font-size:13px;color:rgba(31,35,38,.6);margin-bottom:18px}
+  .yqh_grid{
+    list-style:none;display:grid;gap:2px;
+    grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+    color:var(--yqh_stroke_color);           /* SVG 用 currentColor 取墨 */
+  }
+  .yqh_item{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:20px 6px 14px;background:rgba(242,243,240,.9);
+    transition:background .18s ease;
+  }
+  .yqh_item:hover{background:#fff}
+  .yqh_item svg{width:34px;height:34px}
+  .yqh_item .yqh_name{font-size:13px;letter-spacing:.06em;color:var(--yqh_char)}
+
+  /* ========== 线稿架 ========== */
+  .yqh_rack .yqh_grid{border:2px solid var(--yqh_char)}
+
+  /* ========== 解剖 ========== */
+  .yqh_anatomy{display:grid;grid-template-columns:auto 1fr;gap:clamp(22px,4vw,56px);align-items:start}
+  .yqh_specimen{
+    position:relative;display:grid;place-items:center;
+    width:clamp(170px,24vw,250px);height:clamp(170px,24vw,250px);
+    border:2px solid var(--yqh_char);
+    background:
+      linear-gradient(var(--yqh_line) 1px,transparent 1px) 0 0/25% 25%,
+      linear-gradient(90deg,var(--yqh_line) 1px,transparent 1px) 0 0/25% 25%;
+  }
+  .yqh_specimen svg{width:64%;height:64%;color:var(--yqh_navy)}
+  .yqh_specimen i{
+    position:absolute;font-style:normal;font-family:var(--yqh_mono);
+    font-size:11px;color:rgba(31,35,38,.55);
+  }
+  .yqh_specimen .yqh_vb{left:6px;top:4px}          /* viewBox 标注 */
+  .yqh_specimen .yqh_sw{right:6px;bottom:4px}      /* stroke-width 标注 */
+  pre.yqh_src{
+    background:var(--yqh_char);color:#E6E9E4;padding:22px 24px;
+    font-family:var(--yqh_mono);font-size:13px;line-height:1.9;
+    overflow:auto;border-left:6px solid var(--yqh_amber);
+  }
+  pre.yqh_src .yqh_t{color:#7FC8B4}
+  pre.yqh_src .yqh_a{color:#E0B45C}
+  pre.yqh_src .yqh_c{color:rgba(230,233,228,.5)}
+
+  /* ========== 页脚 & 提示 ========== */
+  .yqh_foot{
+    margin-top:40px;border-top:2px solid var(--yqh_char);
+    padding:26px clamp(20px,6vw,72px);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    font-size:13px;color:rgba(31,35,38,.66);
+  }
+  .yqh_toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);
+    background:var(--yqh_char);color:var(--yqh_mist);
+    padding:10px 22px;border-radius:999px;font-size:14px;letter-spacing:.05em;
+    opacity:0;pointer-events:none;transition:.25s ease;z-index:9;
+  }
+  .yqh_toast.yqh_show{opacity:1;transform:translate(-50%,0)}
+
+  /* ========== 动效：罗盘当场画出来（唯一的一次编排） ========== */
+  @keyframes yqh_line{to{stroke-dashoffset:0}}
+  .yqh_item{animation:yqh_fade .45s ease both}
+  @keyframes yqh_fade{from{opacity:0}to{opacity:1}}
+
+  @media (max-width:760px){
+    .yqh_hero{grid-template-columns:1fr}
+    .yqh_anatomy{grid-template-columns:1fr}
+    .yqh_vol{display:none}
+    .yqh_chips{margin-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .yqh_item{animation:none}
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="yqh_top">
+  <a class="yqh_brand" href="index.html">字<b>·</b>线 图标工坊<span class="yqh_vol">卷二 · 勾线</span></a>
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+</header>
+
+<section class="yqh_hero">
+  <div class="yqh_hero_stage" aria-hidden="true">
+    <i data-lucide="compass" id="yqh_compass"></i>
+  </div>
+  <div>
+    <h1 class="yqh_h1"><small>LUCIDE · SVG</small>把图标，画成一条「线」</h1>
+    <p class="yqh_lede">
+      这里没有字体。每个图标都是一段 24×24 的矢量路径：
+      <code>stroke-width</code> 定粗细，<code>currentColor</code> 定墨色，
+      圆头圆角由路径自带——放大到任何尺寸，线条都不会发虚。
+      左边这枚罗盘，是页面加载时被当场画出来的。
+    </p>
+  </div>
+</section>
+
+<main>
+  <section class="yqh_section">
+    <h2>描边实验台</h2>
+    <p class="yqh_note">拖动滑杆，八个图标被整体重新绘制——这正是 SVG 的本事：粗细是属性，不是像素。</p>
+    <div class="yqh_lab">
+      <div class="yqh_lab_bar">
+        <label for="yqh_stroke">描边粗细</label>
+        <input type="range" class="yqh_stroke" id="yqh_stroke"
+               min="0.5" max="3" step="0.25" value="2">
+        <output class="yqh_stroke_val" id="yqh_stroke_val">2.0 px</output>
+        <div class="yqh_chips" role="group" aria-label="描边颜色">
+          <button class="yqh_chip" data-yqh-color="#1F2326" style="background:#1F2326" aria-pressed="true"  aria-label="炭墨"></button>
+          <button class="yqh_chip" data-yqh-color="#2E6E5E" style="background:#2E6E5E" aria-pressed="false" aria-label="青瓷"></button>
+          <button class="yqh_chip" data-yqh-color="#35507A" style="background:#35507A" aria-pressed="false" aria-label="靛蓝"></button>
+          <button class="yqh_chip" data-yqh-color="#D9952B" style="background:#D9952B" aria-pressed="false" aria-label="藤黄"></button>
+        </div>
+      </div>
+      <p class="yqh_lab_hint" id="yqh_lab_hint">当前调用：lucide.createIcons({ attrs: { "stroke-width": 2 } })</p>
+      <ul class="yqh_grid" id="yqh_lab_grid">
+        <li class="yqh_item"><i data-lucide="heart"></i><span class="yqh_name">heart</span></li>
+        <li class="yqh_item"><i data-lucide="star"></i><span class="yqh_name">star</span></li>
+        <li class="yqh_item"><i data-lucide="settings"></i><span class="yqh_name">settings</span></li>
+        <li class="yqh_item"><i data-lucide="cloud"></i><span class="yqh_name">cloud</span></li>
+        <li class="yqh_item"><i data-lucide="send"></i><span class="yqh_name">send</span></li>
+        <li class="yqh_item"><i data-lucide="camera"></i><span class="yqh_name">camera</span></li>
+        <li class="yqh_item"><i data-lucide="coffee"></i><span class="yqh_name">coffee</span></li>
+        <li class="yqh_item"><i data-lucide="wifi"></i><span class="yqh_name">wifi</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="yqh_section yqh_rack">
+    <h2>线稿架 · 常用线形</h2>
+    <p class="yqh_note">写一个 data-lucide 名字，库便把占位符替换成内联 SVG——图标真正成为 DOM 的一部分，可以被任何 CSS 选择。</p>
+    <ul class="yqh_grid">
+      <li class="yqh_item"><i data-lucide="home"></i><span class="yqh_name">home</span></li>
+      <li class="yqh_item"><i data-lucide="search"></i><span class="yqh_name">search</span></li>
+      <li class="yqh_item"><i data-lucide="pencil"></i><span class="yqh_name">pencil</span></li>
+      <li class="yqh_item"><i data-lucide="image"></i><span class="yqh_name">image</span></li>
+      <li class="yqh_item"><i data-lucide="music"></i><span class="yqh_name">music</span></li>
+      <li class="yqh_item"><i data-lucide="map"></i><span class="yqh_name">map</span></li>
+      <li class="yqh_item"><i data-lucide="umbrella"></i><span class="yqh_name">umbrella</span></li>
+      <li class="yqh_item"><i data-lucide="feather"></i><span class="yqh_name">feather</span></li>
+      <li class="yqh_item"><i data-lucide="layers"></i><span class="yqh_name">layers</span></li>
+      <li class="yqh_item"><i data-lucide="battery-medium"></i><span class="yqh_name">battery</span></li>
+      <li class="yqh_item"><i data-lucide="sun"></i><span class="yqh_name">sun</span></li>
+      <li class="yqh_item"><i data-lucide="moon"></i><span class="yqh_name">moon</span></li>
+      <li class="yqh_item"><i data-lucide="bell"></i><span class="yqh_name">bell</span></li>
+      <li class="yqh_item"><i data-lucide="lock"></i><span class="yqh_name">lock</span></li>
+      <li class="yqh_item"><i data-lucide="github"></i><span class="yqh_name">github</span></li>
+      <li class="yqh_item"><i data-lucide="message-circle"></i><span class="yqh_name">chat</span></li>
+      <li class="yqh_item"><i data-lucide="calendar"></i><span class="yqh_name">calendar</span></li>
+      <li class="yqh_item"><i data-lucide="clock"></i><span class="yqh_name">clock</span></li>
+      <li class="yqh_item"><i data-lucide="download"></i><span class="yqh_name">download</span></li>
+      <li class="yqh_item"><i data-lucide="trash-2"></i><span class="yqh_name">trash</span></li>
+    </ul>
+  </section>
+
+  <section class="yqh_section yqh_anatomy">
+    <div class="yqh_specimen" aria-hidden="true">
+      <i data-lucide="feather"></i>
+      <i class="yqh_vb">viewBox 0 0 24 24</i>
+      <i class="yqh_sw">stroke-width 2</i>
+    </div>
+    <div>
+      <h2 style="margin-bottom:14px">解剖 · 一条路径的真身</h2>
+      <p class="yqh_note" style="margin-top:0">这是线稿架上那支羽毛的全部代码——三笔路径，一段真身。字体图标藏在线型文件里，SVG 图标则把结构摊开给你看。</p>
+      <pre class="yqh_src"><span class="yqh_c">&lt;!-- lucide 官方 feather 图标的真身 --&gt;</span>
+<span class="yqh_t">&lt;svg</span> <span class="yqh_a">xmlns</span>=<span>"http://www.w3.org/2000/svg"</span>
+     <span class="yqh_a">viewBox</span>=<span>"0 0 24 24"</span> <span class="yqh_a">fill</span>=<span>"none"</span>
+     <span class="yqh_a">stroke</span>=<span>"currentColor"</span> <span class="yqh_a">stroke-width</span>=<span>"2"</span>
+     <span class="yqh_a">stroke-linecap</span>=<span>"round"</span> <span class="yqh_a">stroke-linejoin</span>=<span>"round"</span><span class="yqh_t">&gt;</span>
+  <span class="yqh_t">&lt;path</span> <span class="yqh_a">d</span>=<span>"M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"</span><span class="yqh_t">/&gt;</span>
+  <span class="yqh_t">&lt;line</span> <span class="yqh_a">x1</span>=<span>"16"</span> <span class="yqh_a">x2</span>=<span>"2"</span> <span class="yqh_a">y1</span>=<span>"8"</span> <span class="yqh_a">y2</span>=<span>"22"</span><span class="yqh_t">/&gt;</span>
+  <span class="yqh_t">&lt;line</span> <span class="yqh_a">x1</span>=<span>"17.5"</span> <span class="yqh_a">x2</span>=<span>"9"</span> <span class="yqh_a">y1</span>=<span>"15"</span> <span class="yqh_a">y2</span>=<span>"15"</span><span class="yqh_t">/&gt;</span>
+<span class="yqh_t">&lt;/svg&gt;</span></pre>
+    </div>
+  </section>
+</main>
+
+<footer class="yqh_foot">
+  <span>字·线 图标工坊 · 卷二「勾线」—— Lucide（本地 SVG）</span>
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+</footer>
+
+<div class="yqh_toast" id="yqh_toast" role="status" aria-live="polite"></div>
+
+<script>
+  // 所有自定义 JS 变量 / 函数均以 yqh_ 开头（lucide 为库全局对象，不可改名）
+  var yqh_toast = document.getElementById('yqh_toast');
+  var yqh_timer = null;
+
+  function yqh_showToast(yqh_text){
+    yqh_toast.textContent = yqh_text;
+    yqh_toast.classList.add('yqh_show');
+    clearTimeout(yqh_timer);
+    yqh_timer = setTimeout(function(){
+      yqh_toast.classList.remove('yqh_show');
+    }, 1600);
+  }
+
+  // 首次渲染：占位符 <i data-lucide> → 内联 SVG
+  lucide.createIcons();
+
+  // 主视觉：罗盘描边动画——按真实路径长度铺线，一次画完
+  (function yqh_drawCompass(){
+    var yqh_svg = document.querySelector('svg#yqh_compass, [data-lucide="compass"]');
+    if (!yqh_svg || yqh_svg.tagName.toLowerCase() !== 'svg') return;
+    var yqh_strokes = yqh_svg.querySelectorAll('path, circle, polygon, line, polyline');
+    var yqh_reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (yqh_reduced || !yqh_strokes.length) return;
+    yqh_strokes.forEach(function(yqh_p, yqh_i){
+      var yqh_len = 0;
+      try { yqh_len = yqh_p.getTotalLength(); } catch(e){ yqh_len = 200; }
+      yqh_p.style.strokeDasharray = yqh_len;
+      yqh_p.style.strokeDashoffset = yqh_len;
+      yqh_p.animate(
+        [{ strokeDashoffset: yqh_len }, { strokeDashoffset: 0 }],
+        { duration: 900, delay: yqh_i * 260, fill: 'forwards', easing: 'ease-in-out' }
+      );
+    });
+  })();
+
+  // 描边实验台：滑杆改 stroke-width，重新绘制
+  var yqh_strokeInput = document.getElementById('yqh_stroke');
+  var yqh_strokeVal = document.getElementById('yqh_stroke_val');
+  var yqh_labHint = document.getElementById('yqh_lab_hint');
+
+  function yqh_applyStroke(){
+    var yqh_w = parseFloat(yqh_strokeInput.value).toFixed(2).replace(/0$/,'');
+    yqh_strokeVal.textContent = parseFloat(yqh_strokeInput.value).toFixed(1) + ' px';
+    lucide.createIcons({ attrs: { 'stroke-width': parseFloat(yqh_strokeInput.value) } });
+    yqh_labHint.textContent = '当前调用：lucide.createIcons({ attrs: { "stroke-width": ' +
+      parseFloat(yqh_strokeInput.value) + ' } })';
+  }
+  yqh_strokeInput.addEventListener('input', yqh_applyStroke);
+
+  // 颜色墨锭：只换 currentColor，无需重绘
+  var yqh_labGrid = document.getElementById('yqh_lab_grid');
+  document.querySelectorAll('.yqh_chip').forEach(function(yqh_chip){
+    yqh_chip.addEventListener('click', function(){
+      document.querySelectorAll('.yqh_chip').forEach(function(yqh_c){
+        yqh_c.setAttribute('aria-pressed', 'false');
+      });
+      yqh_chip.setAttribute('aria-pressed', 'true');
+      yqh_labGrid.style.setProperty('--yqh_stroke_color', yqh_chip.dataset.yqhColor);
+      yqh_showToast('换墨：' + yqh_chip.getAttribute('aria-label'));
+    });
+  });
+
+  // 线稿架淡入：按 DOM 顺序错开
+  document.querySelectorAll('.yqh_rack .yqh_item').forEach(function(yqh_item, yqh_i){
+    yqh_item.style.animationDelay = (yqh_i * 0.03) + 's';
+  });
+</script>
+</body>
+</html>

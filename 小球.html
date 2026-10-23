@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓小球游戏|函数的三个方法的应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background: #f0f8ff;
+            overflow: hidden;
+            font-size:24px;
+            user-select: none;
+        }
+        #info{
+            padding:16px;
+            background: #222;
+            color: #fff;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .ball{
+            width: 100px;
+            height:100px;
+            background: red;
+            border-radius:50%;
+            position: absolute;
+            cursor: pointer;
+        }
+        button {
+            padding: 6px 14px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <div>当前分数：<span id="score">0</span></div>
+        <div>游戏时长：<span id="time">0</span> s</div>
+        <div>最高分：<span id="maxScore">0</span></div>
+        <button id="pauseBtn">暂停</button>
+        <button id="resetBtn">重新开始</button>
+    </div>
+    <div class="ball" id="ball"></div>
+
+    <script>
+        //const是常量指的是变量的应用地址不能变，不是对象里面的数据不能改变
+        const game = {
+            score: 0,
+            ballDom: document.getElementById('ball'),
+            scoreDom: document.getElementById('score'),
+            timeDom: document.getElementById('time'),
+            maxScoreDom: document.getElementById('maxScore'),
+            pauseBtn: document.getElementById('pauseBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            //小球位置、速度
+            x: 100,
+            y: 150,
+            speedX: 4,
+            speedY: 3,
+            width: 100,
+            height: 100,
+            isPause: false,
+            timer: null, //小球运动定时器
+            timeTimer: null, //计时定时器
+            runTime: 0,
+            //从localStorage读取最高分
+            maxScore: localStorage.getItem('ballMax') ? Number(localStorage.getItem('ballMax')) : 0,
+
+            //初始化游戏
+            init(){
+                this.maxScoreDom.innerText = this.maxScore;
+                this.bindEvent();
+                this.startMove();
+                this.startTimer();
+                this.renderBall();
+            },
+
+            //绑定所有事件
+            bindEvent(){
+                //点击小球：加分 + 换颜色
+                this.ballDom.addEventListener('click', (e)=>{
+                    e.stopPropagation(); //阻止冒泡，不触发空白点击
+                    this.addScore(10);
+                    this.randomColor();
+                    //分数越高，速度越快
+                    this.speedUp();
+                })
+                //点击页面空白处：扣分
+                document.body.addEventListener('click', ()=>{
+                    if(this.isPause) return;
+                    this.addScore(-5);
+                })
+                //暂停按钮
+                this.pauseBtn.onclick = ()=>{
+                    this.togglePause();
+                }
+                //重置游戏
+                this.resetBtn.onclick = ()=>{
+                    this.resetGame();
+                }
+            },
+
+            //小球运动函数
+            startMove(){
+                this.timer = setInterval(()=>{
+                    if(this.isPause) return;
+                    this.move();
+                    this.checkBorder();
+                    this.renderBall();
+                }, 20)
+            },
+
+            //小球移动
+            move(){
+                this.x += this.speedX;
+                this.y += this.speedY;
+            },
+
+            //边界碰撞检测，反弹
+            checkBorder(){
+                const maxW = window.innerWidth - this.width;
+                const maxH = window.innerHeight - this.height;
+                //左右边界反弹
+                if(this.x <= 0 || this.x >= maxW){
+                    this.speedX *= -1;
+                }
+                //上下边界反弹
+                if(this.y <= 0 || this.y >= maxH){
+                    this.speedY *= -1;
+                }
+            },
+
+            //渲染小球位置
+            renderBall(){
+                this.ballDom.style.left = this.x + 'px';
+                this.ballDom.style.top = this.y + 'px';
+            },
+
+            //加分扣分
+            addScore(num){
+                this.score += num;
+                if(this.score < 0) this.score = 0; //分数不能负数
+                this.scoreDom.innerText = this.score;
+                //更新最高分
+                if(this.score > this.maxScore){
+                    this.maxScore = this.score;
+                    this.maxScoreDom.innerText = this.maxScore;
+                    localStorage.setItem('ballMax', this.maxScore)
+                }
+            },
+
+            //随机小球颜色
+            randomColor(){
+                const r = Math.floor(Math.random()*256);
+                const g = Math.floor(Math.random()*256);
+                const b = Math.floor(Math.random()*256);
+                this.ballDom.style.background = `rgb(${r},${g},${b})`
+            },
+
+            //提速
+            speedUp(){
+                this.speedX = this.speedX > 0 ? this.speedX + 0.3 : this.speedX -0.3;
+                this.speedY = this.speedY > 0 ? this.speedY + 0.3 : this.speedY -0.3;
+            },
+
+            //计时
+            startTimer(){
+                this.timeTimer = setInterval(()=>{
+                    if(this.isPause) return;
+                    this.runTime ++;
+                    this.timeDom.innerText = this.runTime;
+                }, 1000)
+            },
+
+            //暂停/继续
+            togglePause(){
+                this.isPause = !this.isPause;
+                this.pauseBtn.innerText = this.isPause ? "继续" : "暂停";
+            },
+
+            //重置游戏
+            resetGame(){
+                //清除定时器
+                clearInterval(this.timer);
+                clearInterval(this.timeTimer);
+                //重置数据
+                this.score = 0;
+                this.runTime = 0;
+                this.speedX = 4;
+                this.speedY = 3;
+                this.x = 100;
+                this.y = 150;
+                this.isPause = false;
+                this.pauseBtn.innerText = "暂停";
+                this.scoreDom.innerText = 0;
+                this.timeDom.innerText = 0;
+                this.ballDom.style.background = "red";
+                this.renderBall();
+                this.startMove();
+                this.startTimer();
+            }
+        };
+        //启动游戏
+        game.init();
+    </script>
+</body>
+</html>

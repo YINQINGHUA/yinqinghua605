@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>掌上勾线 · SVG 图标底部导航 | 字·线 图标工坊</title>
+<!-- 卷四 · SVG 方式：iconfont.js 把 <symbol> 精灵注入页面，图标以 <use> 引用 -->
+<script src="font/iconfont.js"></script>
+<style>
+  /* ========== 卷四「掌上勾线」令牌：雾纸 × 炭墨 × 青瓷 × 藤黄 ========== */
+  :root{
+    --yqh_mist:#F2F3F0;         /* 桌面底 */
+    --yqh_screen:#FAFBF8;       /* 手机屏面 */
+    --yqh_char:#1F2326;
+    --yqh_jade:#2E6E5E;         /* 选中色 */
+    --yqh_red:#C23B22;          /* 徽章色 */
+    --yqh_line:rgba(31,35,38,.14);
+    --yqh_disp:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    --yqh_body:"Microsoft YaHei","PingFang SC",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--yqh_mist);
+    font-family:var(--yqh_body);color:var(--yqh_char);line-height:1.6;
+  }
+
+  /* ========== 桌面端说明行（移动端窄屏时也在页面顶部） ========== */
+  .yqh_caption{
+    max-width:480px;margin:0 auto;padding:18px 16px 10px;
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+  }
+  .yqh_caption h1{
+    font-family:var(--yqh_disp);font-size:17px;font-weight:800;letter-spacing:.02em;
+  }
+  .yqh_caption h1 small{
+    font-weight:400;font-size:12px;color:var(--yqh_jade);letter-spacing:.05em;margin-left:10px;
+  }
+  .yqh_home{
+    color:var(--yqh_char);text-decoration:none;font-size:13px;font-weight:700;
+    border-bottom:3px solid #D9952B;padding-bottom:1px;white-space:nowrap;
+  }
+  .yqh_home:hover{color:var(--yqh_jade)}
+  .yqh_home:focus-visible,.yqh_tab:focus-visible,.yqh_add:focus-visible{
+    outline:2px solid var(--yqh_jade);outline-offset:3px}
+
+  /* ========== 手机屏面：居中一列，自适应宽度 ========== */
+  .yqh_screen{
+    max-width:480px;margin:0 auto;min-height:100%;
+    background:var(--yqh_screen);
+    box-shadow:0 0 0 2px var(--yqh_char), 0 18px 44px rgba(31,35,38,.18);
+    display:flex;flex-direction:column;
+  }
+
+  /* 店头 */
+  .yqh_shopbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 18px 14px;border-bottom:2px solid var(--yqh_char);
+    position:sticky;top:0;background:var(--yqh_screen);z-index:5;
+  }
+  .yqh_shopbar h2{font-family:var(--yqh_disp);font-size:20px;font-weight:800;letter-spacing:.02em}
+  .yqh_shopbar h2 i{font-style:normal;color:var(--yqh_jade)}
+  .yqh_shopbar em{
+    font-style:normal;font-size:11px;color:var(--yqh_jade);font-weight:700;
+    border:2px solid var(--yqh_jade);padding:1px 9px;letter-spacing:.15em;
+  }
+
+  /* 商品行 */
+  .yqh_goods{flex:1;padding:6px 18px calc(96px + env(safe-area-inset-bottom))}
+  .yqh_goods>p{
+    font-size:12px;color:rgba(31,35,38,.62);padding:12px 2px 10px;letter-spacing:.04em;
+  }
+  .yqh_item{
+    display:flex;align-items:center;gap:14px;
+    padding:15px 2px;border-bottom:.5px solid var(--yqh_line);
+  }
+  .yqh_item:last-child{border-bottom:none}
+  .yqh_item .yqh_glyph{
+    flex:none;width:46px;height:46px;display:grid;place-items:center;
+    background:rgba(46,110,94,.1);color:var(--yqh_jade);
+    border-radius:10px;
+  }
+  .yqh_item .yqh_info{flex:1;min-width:0}
+  .yqh_item .yqh_info b{font-size:15px;font-weight:700;display:block}
+  .yqh_item .yqh_info span{font-size:12px;color:rgba(31,35,38,.6)}
+  .yqh_item .yqh_price{
+    font-size:15px;font-weight:700;color:var(--yqh_red);white-space:nowrap;
+  }
+  .yqh_item .yqh_price::before{content:"¥";font-size:11px;margin-right:1px}
+  .yqh_add{
+    flex:none;width:30px;height:30px;border-radius:50%;
+    border:2px solid var(--yqh_char);background:var(--yqh_screen);
+    color:var(--yqh_char);font-size:17px;line-height:1;cursor:pointer;
+    transition:transform .15s ease,background .15s ease,color .15s ease;
+  }
+  .yqh_add:hover{background:var(--yqh_jade);border-color:var(--yqh_jade);color:var(--yqh_screen)}
+  .yqh_add:active{transform:scale(.9)}
+
+  /* ========== 固定底部导航：整行宽度自适应，四项等分 ========== */
+  .yqh_tabbar{
+    position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+    width:100%;max-width:480px;
+    display:flex;align-items:stretch;
+    background:var(--yqh_screen);
+    border-top:2px solid var(--yqh_char);
+    box-shadow:0 -8px 24px rgba(31,35,38,.08);
+    padding-bottom:env(safe-area-inset-bottom);
+    z-index:10;
+  }
+  .yqh_tab{
+    flex:1;                       /* 自适应等分：任何屏宽都是四等份 */
+    min-width:0;
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:10px 4px 9px;border:none;background:none;cursor:pointer;
+    color:rgba(31,35,38,.55);font-family:var(--yqh_body);
+    transition:color .18s ease;
+  }
+  .yqh_icon_wrap{position:relative;display:grid;place-items:center;height:28px}
+  .yqh_use{width:24px;height:24px;fill:currentColor;display:block}
+  .yqh_label{font-size:11px;letter-spacing:.1em}
+  .yqh_tab.yqh_active{color:var(--yqh_jade)}
+  .yqh_tab.yqh_active .yqh_label{font-weight:700}
+  .yqh_tab.yqh_active .yqh_use{transform:translateY(-1px) scale(1.06);transition:transform .18s ease}
+  .yqh_tab:not(.yqh_active):hover{color:var(--yqh_char)}
+
+  /* 徽章：图标右上角 */
+  .yqh_badge_num{
+    position:absolute;top:-7px;right:-13px;
+    min-width:17px;height:17px;padding:0 4px;
+    background:var(--yqh_red);color:#fff;
+    border:2px solid var(--yqh_screen);border-radius:999px;
+    font-size:10px;font-weight:700;line-height:13px;text-align:center;
+    font-style:normal;font-family:var(--yqh_body);
+  }
+  .yqh_dot{
+    position:absolute;top:-2px;right:-11px;
+    width:9px;height:9px;border-radius:50%;
+    background:var(--yqh_red);
+    border:2px solid var(--yqh_screen);
+  }
+  .yqh_dot.yqh_dot_off{display:none}
+
+  /* 徽章弹跳：回应“加入购物车”的动作 */
+  @keyframes yqh_pop{
+    0%{transform:scale(1)}
+    40%{transform:scale(1.45)}
+    100%{transform:scale(1)}
+  }
+  .yqh_badge_num.yqh_pop{animation:yqh_pop .32s ease}
+
+  /* 入场：一次编排，导航四格错峰浮起（导航条的动画全程保留 translateX(-50%) 居中） */
+  @keyframes yqh_rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes yqh_rise_bar{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+  .yqh_tabbar{animation:yqh_rise_bar .5s .1s ease both}
+  .yqh_item{animation:yqh_rise .45s ease both}
+
+  @media (max-width:560px){
+    .yqh_caption{padding:14px 16px 8px}
+    .yqh_screen{box-shadow:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .yqh_tabbar,.yqh_item{animation:none}
+    .yqh_badge_num.yqh_pop{animation:none}
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="yqh_caption">
+  <h1>字<i>·</i>线 图标工坊<small>卷四 · 掌上勾线（SVG 图标）</small></h1>
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+</div>
+
+<div class="yqh_screen">
+
+  <header class="yqh_shopbar">
+    <h2>字<i>·</i>线小铺</h2>
+    <em id="yqh_page_title">首页</em>
+  </header>
+
+  <main class="yqh_goods">
+    <p>同一方小铺 · 图标改为 symbol + use 引用 · 下方「+」可试试购物车徽章的变化</p>
+
+    <div class="yqh_item">
+      <span class="yqh_glyph"><svg class="yqh_use" aria-hidden="true"><use href="#icon-shouye"></use></svg></span>
+      <div class="yqh_info"><b>楷书字帖</b><span>描红三十六式 · 线装</span></div>
+      <span class="yqh_price">12.0</span>
+      <button class="yqh_add" aria-label="把楷书字帖加入购物车">+</button>
+    </div>
+
+    <div class="yqh_item">
+      <span class="yqh_glyph"><svg class="yqh_use" aria-hidden="true"><use href="#icon-gouwuche"></use></svg></span>
+      <div class="yqh_info"><b>靛青墨水</b><span>30ml 玻璃瓶 · 深靛</span></div>
+      <span class="yqh_price">28.0</span>
+      <button class="yqh_add" aria-label="把靛青墨水加入购物车">+</button>
+    </div>
+
+    <div class="yqh_item">
+      <span class="yqh_glyph"><svg class="yqh_use" aria-hidden="true"><use href="#icon-shoucang"></use></svg></span>
+      <div class="yqh_info"><b>朱砂印泥</b><span>盒装 · 工坊调色</span></div>
+      <span class="yqh_price">36.0</span>
+      <button class="yqh_add" aria-label="把朱砂印泥加入购物车">+</button>
+    </div>
+
+    <div class="yqh_item">
+      <span class="yqh_glyph"><svg class="yqh_use" aria-hidden="true"><use href="#icon-wode"></use></svg></span>
+      <div class="yqh_info"><b>勾线笔</b><span>狼毫小楷 · 一支</span></div>
+      <span class="yqh_price">9.9</span>
+      <button class="yqh_add" aria-label="把勾线笔加入购物车">+</button>
+    </div>
+  </main>
+
+  <!-- 固定底部导航：4 项等分自适应宽度 -->
+  <nav class="yqh_tabbar" aria-label="底部导航">
+    <button class="yqh_tab yqh_active" data-yqh-label="首页">
+      <span class="yqh_icon_wrap">
+        <svg class="yqh_use" aria-hidden="true"><use href="#icon-shouye"></use></svg>
+      </span>
+      <span class="yqh_label">首页</span>
+    </button>
+    <button class="yqh_tab" data-yqh-label="购物车">
+      <span class="yqh_icon_wrap">
+        <svg class="yqh_use" aria-hidden="true"><use href="#icon-gouwuche"></use></svg>
+        <b class="yqh_badge_num" id="yqh_cart_badge">3</b>
+      </span>
+      <span class="yqh_label">购物车</span>
+    </button>
+    <button class="yqh_tab" data-yqh-label="收藏">
+      <span class="yqh_icon_wrap">
+        <svg class="yqh_use" aria-hidden="true"><use href="#icon-shoucang"></use></svg>
+      </span>
+      <span class="yqh_label">收藏</span>
+    </button>
+    <button class="yqh_tab" data-yqh-label="我的">
+      <span class="yqh_icon_wrap">
+        <svg class="yqh_use" aria-hidden="true"><use href="#icon-wode"></use></svg>
+        <b class="yqh_dot" id="yqh_me_dot"></b>
+      </span>
+      <span class="yqh_label">我的</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+  // 所有自定义 JS 变量 / 函数均以 yqh_ 开头
+  var yqh_cart_count = 3;
+  var yqh_title = document.getElementById('yqh_page_title');
+  var yqh_cart_badge = document.getElementById('yqh_cart_badge');
+  var yqh_me_dot = document.getElementById('yqh_me_dot');
+
+  // 关键一步：iconfont 精灵里部分 path 写死了 fill 属性，
+  // 不去掉的话，选中态的变色会被“钉死”在灰黑两色上。
+  function yqh_strip_fills(){
+    document.querySelectorAll('symbol[id^="icon-"] path[fill]').forEach(function(yqh_p){
+      yqh_p.removeAttribute('fill');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', yqh_strip_fills);
+  window.addEventListener('load', yqh_strip_fills);
+
+  // 底部导航：切换选中态；首次进入“我的”时清除红点
+  document.querySelectorAll('.yqh_tab').forEach(function(yqh_tab){
+    yqh_tab.addEventListener('click', function(){
+      document.querySelectorAll('.yqh_tab').forEach(function(yqh_t){
+        yqh_t.classList.remove('yqh_active');
+      });
+      yqh_tab.classList.add('yqh_active');
+      yqh_title.textContent = yqh_tab.dataset.yqhLabel;
+      if (yqh_tab.dataset.yqhLabel === '我的') yqh_me_dot.classList.add('yqh_dot_off');
+    });
+  });
+
+  // 数字徽章：加入购物车后 +1 并弹跳一下
+  document.querySelectorAll('.yqh_add').forEach(function(yqh_btn){
+    yqh_btn.addEventListener('click', function(){
+      yqh_cart_count++;
+      yqh_cart_badge.textContent = yqh_cart_count;
+      yqh_cart_badge.classList.remove('yqh_pop');
+      void yqh_cart_badge.offsetWidth;   // 重新触发动画
+      yqh_cart_badge.classList.add('yqh_pop');
+    });
+  });
+
+  // 商品行入场错峰
+  document.querySelectorAll('.yqh_item').forEach(function(yqh_row, yqh_i){
+    yqh_row.style.animationDelay = (0.12 + yqh_i * 0.06) + 's';
+  });
+</script>
+</body>
+</html>

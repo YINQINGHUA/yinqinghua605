@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>铸字 · Font Awesome 字体图标 | 字·线 图标工坊</title>
+<!-- Font Awesome 6 · 本地字体图标方案：all.min.css 会到 ../webfonts/ 自动加载 woff2 -->
+<link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+<style>
+  /* ========== 卷一「铸字」设计令牌：瓷纸 × 玄墨 × 靛青 × 朱砂 × 铜金 ========== */
+  :root{
+    --yqh_paper:#F1EFE7;        /* 瓷纸底 */
+    --yqh_ink:#22262E;          /* 玄墨 */
+    --yqh_indigo:#24417C;       /* 靛青 主色 */
+    --yqh_seal:#A63B25;         /* 朱砂 点睛 */
+    --yqh_brass:#9A7B2E;        /* 铜金 */
+    --yqh_line:rgba(36,65,124,.16);
+    --yqh_kai:"Kaiti SC","STKaiti","KaiTi","楷体","Noto Serif SC",serif;
+    --yqh_body:"Microsoft YaHei","PingFang SC",sans-serif;
+    --yqh_mono:"Consolas","Courier New",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--yqh_paper);
+    color:var(--yqh_ink);
+    font-family:var(--yqh_body);
+    line-height:1.7;
+    /* 铸字车间：极淡的格线，像字盘的木格 */
+    background-image:
+      linear-gradient(var(--yqh_line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--yqh_line) 1px, transparent 1px);
+    background-size:56px 56px;
+  }
+  ::selection{background:var(--yqh_indigo);color:var(--yqh_paper)}
+
+  /* ========== 顶栏 ========== */
+  .yqh_top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px clamp(20px,6vw,72px);
+    border-bottom:2px solid var(--yqh_ink);
+  }
+  .yqh_brand{
+    font-family:var(--yqh_kai);font-size:22px;font-weight:700;
+    letter-spacing:.12em;color:var(--yqh_ink);text-decoration:none;
+  }
+  .yqh_brand b{color:var(--yqh_seal)}
+  .yqh_vol{
+    font-size:13px;color:var(--yqh_indigo);
+    border:1px solid var(--yqh_indigo);border-radius:999px;
+    padding:2px 12px;margin-left:14px;vertical-align:3px;letter-spacing:.2em;
+  }
+  .yqh_home{
+    color:var(--yqh_ink);text-decoration:none;font-size:14px;
+    border-bottom:2px solid var(--yqh_seal);padding-bottom:2px;
+  }
+  .yqh_home:hover{color:var(--yqh_seal)}
+  .yqh_home:focus-visible,.yqh_cell:focus-visible,.yqh_copy:focus-visible{
+    outline:2px solid var(--yqh_seal);outline-offset:3px}
+
+  /* ========== 主视觉：一个字 + 一枚印 ========== */
+  .yqh_hero{
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(28px,6vw,88px);
+    align-items:center;
+    padding:clamp(48px,9vh,110px) clamp(20px,6vw,72px) clamp(40px,7vh,80px);
+  }
+  .yqh_seal_block{
+    position:relative;display:grid;place-items:center;
+    width:clamp(150px,22vw,230px);height:clamp(150px,22vw,230px);
+    background:var(--yqh_seal);color:var(--yqh_paper);
+    box-shadow:10px 10px 0 var(--yqh_indigo);
+  }
+  .yqh_seal_block .fa-font{font-size:clamp(84px,13vw,132px);line-height:1}
+  .yqh_seal_mark{
+    position:absolute;right:-14px;top:-14px;
+    width:44px;height:44px;background:var(--yqh_ink);color:var(--yqh_paper);
+    font-family:var(--yqh_kai);font-size:20px;display:grid;place-items:center;
+    border-radius:50%;
+  }
+  .yqh_h1{
+    font-family:var(--yqh_kai);
+    font-size:clamp(44px,7.5vw,92px);
+    font-weight:700;line-height:1.15;letter-spacing:.04em;
+  }
+  .yqh_h1 small{
+    display:block;font-size:.42em;letter-spacing:.5em;
+    color:var(--yqh_indigo);margin-bottom:8px;font-weight:400;
+  }
+  .yqh_lede{
+    max-width:34em;margin-top:18px;font-size:clamp(15px,1.6vw,18px);
+    color:rgba(34,38,46,.82);
+  }
+  .yqh_lede code{
+    font-family:var(--yqh_mono);font-size:.9em;background:rgba(36,65,124,.1);
+    padding:2px 7px;border-radius:4px;color:var(--yqh_indigo);
+  }
+
+  /* ========== 字盘 ========== */
+  .yqh_section{padding:clamp(36px,6vh,64px) clamp(20px,6vw,72px)}
+  .yqh_section>h2{
+    font-family:var(--yqh_kai);font-size:clamp(26px,3.4vw,38px);
+    letter-spacing:.08em;display:flex;align-items:baseline;gap:16px;
+  }
+  .yqh_section>h2::after{
+    content:"";flex:1;height:2px;background:var(--yqh_ink);transform:translateY(-6px)}
+  .yqh_section>p.yqh_note{max-width:36em;margin:10px 0 26px;color:rgba(34,38,46,.72)}
+  .yqh_group{margin-bottom:34px}
+  .yqh_group>h3{
+    font-size:14px;color:var(--yqh_seal);letter-spacing:.35em;margin-bottom:12px;
+  }
+  .yqh_tray{
+    list-style:none;display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+    border:2px solid var(--yqh_ink);background:var(--yqh_paper);
+  }
+  .yqh_cell{
+    position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
+    width:100%;height:100%;
+    padding:22px 8px 16px;border:.5px solid var(--yqh_line);cursor:pointer;
+    background:none;color:var(--yqh_ink);font-family:var(--yqh_body);
+    transition:background .18s ease,color .18s ease;
+  }
+  .yqh_cell i{font-size:30px;color:var(--yqh_indigo);transition:color .18s ease}
+  .yqh_cell .yqh_name{font-size:13px;letter-spacing:.08em}
+  .yqh_cell .yqh_code{
+    font-family:var(--yqh_mono);font-size:11px;color:rgba(34,38,46,.55);
+    opacity:0;transform:translateY(4px);transition:.18s ease;
+  }
+  .yqh_cell:hover,.yqh_cell:focus-visible{background:var(--yqh_indigo);color:var(--yqh_paper)}
+  .yqh_cell:hover i,.yqh_cell:focus-visible i{color:var(--yqh_paper)}
+  .yqh_cell:hover .yqh_code,.yqh_cell:focus-visible .yqh_code{
+    opacity:1;transform:none;color:rgba(241,239,231,.85)}
+
+  /* ========== 字阶 ========== */
+  .yqh_scale_row{
+    display:flex;align-items:baseline;gap:clamp(14px,3vw,36px);flex-wrap:wrap;
+    border:2px solid var(--yqh_ink);padding:clamp(18px,3vw,36px);
+    background:rgba(241,239,231,.6);
+  }
+  .yqh_step{text-align:center}
+  .yqh_step i{display:block;color:var(--yqh_indigo);line-height:1}
+  .yqh_step em{
+    font-style:normal;font-family:var(--yqh_mono);font-size:11px;
+    color:rgba(34,38,46,.55);display:block;margin-top:8px;
+  }
+
+  /* ========== 原理 ========== */
+  .yqh_how{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(20px,4vw,56px);align-items:start}
+  .yqh_how_txt p{max-width:34em;margin-bottom:14px;color:rgba(34,38,46,.85)}
+  .yqh_how_txt p b{color:var(--yqh_seal)}
+  pre.yqh_src{
+    background:var(--yqh_ink);color:#E8E4D8;padding:22px 24px;
+    font-family:var(--yqh_mono);font-size:13px;line-height:1.9;
+    overflow:auto;border-left:6px solid var(--yqh_seal);
+  }
+  pre.yqh_src .yqh_t{color:#8FA6D9}   /* 标签 */
+  pre.yqh_src .yqh_a{color:#C9A85C}   /* 属性 */
+  pre.yqh_src .yqh_c{color:rgba(232,228,216,.5)} /* 注释 */
+
+  /* ========== 页脚 ========== */
+  .yqh_foot{
+    margin-top:40px;border-top:2px solid var(--yqh_ink);
+    padding:26px clamp(20px,6vw,72px);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    font-size:13px;color:rgba(34,38,46,.66);
+  }
+
+  /* ========== 复制提示 ========== */
+  .yqh_toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);
+    background:var(--yqh_ink);color:var(--yqh_paper);
+    padding:10px 22px;border-radius:999px;font-size:14px;letter-spacing:.05em;
+    opacity:0;pointer-events:none;transition:.25s ease;z-index:9;
+  }
+  .yqh_toast.yqh_show{opacity:1;transform:translate(-50%,0)}
+  .yqh_toast i{color:var(--yqh_brass);margin-right:8px}
+
+  /* ========== 入场动效：一次编排，字盘落格 ========== */
+  @keyframes yqh_drop{
+    from{opacity:0;transform:translateY(14px)}
+    to{opacity:1;transform:none}
+  }
+  .yqh_cell{animation:yqh_drop .5s ease both}
+  .yqh_seal_block{animation:yqh_drop .6s ease both}
+  .yqh_hero>div:last-child{animation:yqh_drop .6s .12s ease both}
+
+  /* ========== 响应式 & 降级 ========== */
+  @media (max-width:760px){
+    .yqh_hero{grid-template-columns:1fr}
+    .yqh_how{grid-template-columns:1fr}
+    .yqh_vol{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .yqh_cell,.yqh_seal_block,.yqh_hero>div:last-child{animation:none}
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="yqh_top">
+  <a class="yqh_brand" href="index.html">字<b>·</b>线 图标工坊<span class="yqh_vol">卷一 · 铸字</span></a>
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+</header>
+
+<section class="yqh_hero">
+  <div class="yqh_seal_block" aria-hidden="true">
+    <i class="fa-solid fa-font"></i>
+    <span class="yqh_seal_mark">铸</span>
+  </div>
+  <div>
+    <h1 class="yqh_h1"><small>FONT AWESOME 6</small>把图标，铸成一个「字」</h1>
+    <p class="yqh_lede">
+      字体图标把每个图形做成字体里的一个字形：写一行类名，引用一个码位，
+      图标就随文字缩放、换色、加粗。下面这方字盘里的每一格，
+      都是一枚真实的字体，点击即可复制它的类名。
+    </p>
+  </div>
+</section>
+
+<main>
+  <section class="yqh_section">
+    <h2>字盘 · 常用字形</h2>
+    <p class="yqh_note">悬停可见码位，点击复制完整类名。品牌印记取自第二块字盘（brands 字体）。</p>
+
+    <div class="yqh_group">
+      <h3>界面 · 器物</h3>
+      <ul class="yqh_tray">
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-house"><i class="fa-solid fa-house"></i><span class="yqh_name">主页</span><span class="yqh_code">\f015</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-magnifying-glass"><i class="fa-solid fa-magnifying-glass"></i><span class="yqh_name">搜索</span><span class="yqh_code">\f002</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-gear"><i class="fa-solid fa-gear"></i><span class="yqh_name">设置</span><span class="yqh_code">\f013</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-envelope"><i class="fa-solid fa-envelope"></i><span class="yqh_name">信封</span><span class="yqh_code">\f0e0</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-cart-shopping"><i class="fa-solid fa-cart-shopping"></i><span class="yqh_name">购物车</span><span class="yqh_code">\f07a</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-bell"><i class="fa-solid fa-bell"></i><span class="yqh_name">铃铛</span><span class="yqh_code">\f0f3</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-heart"><i class="fa-solid fa-heart"></i><span class="yqh_name">心</span><span class="yqh_code">\f004</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-star"><i class="fa-solid fa-star"></i><span class="yqh_name">星</span><span class="yqh_code">\f005</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-user"><i class="fa-solid fa-user"></i><span class="yqh_name">用户</span><span class="yqh_code">\f007</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-lock"><i class="fa-solid fa-lock"></i><span class="yqh_name">锁</span><span class="yqh_code">\f023</span></button></li>
+      </ul>
+    </div>
+
+    <div class="yqh_group">
+      <h3>媒体 · 声像</h3>
+      <ul class="yqh_tray">
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-play"><i class="fa-solid fa-play"></i><span class="yqh_name">播放</span><span class="yqh_code">\f04b</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-pause"><i class="fa-solid fa-pause"></i><span class="yqh_name">暂停</span><span class="yqh_code">\f04c</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-camera"><i class="fa-solid fa-camera"></i><span class="yqh_name">相机</span><span class="yqh_code">\f030</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-image"><i class="fa-solid fa-image"></i><span class="yqh_name">图片</span><span class="yqh_code">\f03e</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-music"><i class="fa-solid fa-music"></i><span class="yqh_name">音乐</span><span class="yqh_code">\f001</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-microphone"><i class="fa-solid fa-microphone"></i><span class="yqh_name">麦克风</span><span class="yqh_code">\f130</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-headphones"><i class="fa-solid fa-headphones"></i><span class="yqh_name">耳机</span><span class="yqh_code">\f025</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-solid fa-film"><i class="fa-solid fa-film"></i><span class="yqh_name">影片</span><span class="yqh_code">\f008</span></button></li>
+      </ul>
+    </div>
+
+    <div class="yqh_group">
+      <h3>品牌 · 印记</h3>
+      <ul class="yqh_tray">
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-github"><i class="fa-brands fa-github"></i><span class="yqh_name">GitHub</span><span class="yqh_code">\f09b</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-weibo"><i class="fa-brands fa-weibo"></i><span class="yqh_name">微博</span><span class="yqh_code">\f18a</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-weixin"><i class="fa-brands fa-weixin"></i><span class="yqh_name">微信</span><span class="yqh_code">\f1d7</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-qq"><i class="fa-brands fa-qq"></i><span class="yqh_name">QQ</span><span class="yqh_code">\f1d6</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-youtube"><i class="fa-brands fa-youtube"></i><span class="yqh_name">YouTube</span><span class="yqh_code">\f167</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-steam"><i class="fa-brands fa-steam"></i><span class="yqh_name">Steam</span><span class="yqh_code">\f1b6</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-chrome"><i class="fa-brands fa-chrome"></i><span class="yqh_name">Chrome</span><span class="yqh_code">\f268</span></button></li>
+        <li><button class="yqh_cell" data-yqh-class="fa-brands fa-android"><i class="fa-brands fa-android"></i><span class="yqh_name">Android</span><span class="yqh_code">\f17b</span></button></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="yqh_section">
+    <h2>字阶 · 一形九阶</h2>
+    <p class="yqh_note">字体图标继承 font-size——改一个字号，整枚图标随之缩放，边缘永远锐利。</p>
+    <div class="yqh_scale_row" aria-label="同一图标从 2 倍到 9 倍的字阶演示">
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-2x"></i><em>2x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-3x"></i><em>3x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-4x"></i><em>4x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-5x"></i><em>5x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-6x"></i><em>6x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-7x"></i><em>7x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-8x"></i><em>8x</em></span>
+      <span class="yqh_step"><i class="fa-solid fa-anchor fa-9x"></i><em>9x</em></span>
+    </div>
+  </section>
+
+  <section class="yqh_section yqh_how">
+    <div class="yqh_how_txt">
+      <h2>原理 · 两个文件</h2>
+      <p style="margin:14px 0 18px">本页没有连网。一份 <b>all.min.css</b> 声明 @font-face，
+        浏览器按相对路径到 <b>webfonts/</b> 里取出 woff2 字体；之后每个 <code style="font-family:var(--yqh_mono)">&lt;i&gt;</code>
+        就是一个普通的文字节点——它之所以是图标，只因为换了字体。</p>
+      <p>这也是字体图标的天性与局限：继承文字的渲染，也能被文字的方式改变；
+        但一枚字形只有一种颜色、一种形状，想改线条粗细，就得看卷二的矢量做法了。</p>
+    </div>
+    <pre class="yqh_src"><span class="yqh_c">&lt;!-- ① 引入样式，字体自动跟随 --&gt;</span>
+<span class="yqh_t">&lt;link</span> <span class="yqh_a">rel</span>=<span>"stylesheet"</span>
+      <span class="yqh_a">href</span>=<span>"cdn/fontawesome/css/all.min.css"</span><span class="yqh_t">&gt;</span>
+
+<span class="yqh_c">&lt;!-- ② 类名即字形，码位藏在字体里 --&gt;</span>
+<span class="yqh_t">&lt;i</span> <span class="yqh_a">class</span>=<span>"fa-solid fa-gear"</span><span class="yqh_t">&gt;&lt;/i&gt;</span>
+
+<span class="yqh_c">/* ③ 纯 CSS 也可以：伪元素里写字位 */</span>
+<span>.yqh_icon::after</span> <span>{</span>
+  <span class="yqh_a">font-family</span>: <span>"Font Awesome 6 Free"</span>;
+  <span class="yqh_a">content</span>: <span>"\f013"</span>;  <span class="yqh_c">/* gear */</span>
+<span>}</span></pre>
+  </section>
+</main>
+
+<footer class="yqh_foot">
+  <span>字·线 图标工坊 · 卷一「铸字」—— Font Awesome 6 Free（本地字体）</span>
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+</footer>
+
+<div class="yqh_toast" id="yqh_toast" role="status" aria-live="polite"></div>
+
+<script>
+  // 所有自定义 JS 变量 / 函数均以 yqh_ 开头
+  var yqh_toast = document.getElementById('yqh_toast');
+  var yqh_timer = null;
+
+  function yqh_showToast(yqh_text){
+    yqh_toast.innerHTML = '<i class="fa-solid fa-stamp"></i>已复制 ' + yqh_text;
+    yqh_toast.classList.add('yqh_show');
+    clearTimeout(yqh_timer);
+    yqh_timer = setTimeout(function(){
+      yqh_toast.classList.remove('yqh_show');
+    }, 1600);
+  }
+
+  function yqh_copyClass(yqh_text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(yqh_text).then(function(){
+        yqh_showToast(yqh_text);
+      }, function(){
+        yqh_fallbackCopy(yqh_text);
+      });
+    } else {
+      yqh_fallbackCopy(yqh_text);
+    }
+  }
+
+  function yqh_fallbackCopy(yqh_text){
+    var yqh_input = document.createElement('textarea');
+    yqh_input.value = yqh_text;
+    document.body.appendChild(yqh_input);
+    yqh_input.select();
+    try { document.execCommand('copy'); yqh_showToast(yqh_text); } catch(e){}
+    document.body.removeChild(yqh_input);
+  }
+
+  // 字盘：直接绑定每个格子，点击复制类名；按 DOM 顺序错开落格动画
+  var yqh_cells = document.querySelectorAll('.yqh_cell');
+  yqh_cells.forEach(function(yqh_cell, yqh_i){
+    yqh_cell.addEventListener('click', function(){
+      yqh_copyClass(yqh_cell.dataset.yqhClass);
+    });
+    yqh_cell.style.animationDelay = (yqh_i * 0.045) + 's';
+  });
+</script>
+</body>
+</html>

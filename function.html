@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS函数</title>
+</head>
+<body>
+    <!-- 写一个随机数的猜数游戏，计算机随机给出一定范围的随机数，学生输入猜测的数字，
+     计算机给出数字打了或者小了，直到猜中或者达到指定的猜测次数 -->
+     <button onclick="guessGame()">猜猜我是几？</button>
+     <script>
+        function guessGame() {
+            var min = 1;
+            var max = 100;
+            var target = Math.floor(Math.random() * (max - min + 1)) + min;
+            var guess;
+            var attempts = 0;
+            var maxAttempts = 10;
+
+            while (attempts < maxAttempts) {
+                guess = prompt("请输入你猜测的数字（" + min + "到" + max + "）：");
+                guess = parseInt(guess);
+
+                if (isNaN(guess)) {
+                    alert("请输入一个有效的数字！");
+                    continue;
+                }
+
+                attempts++;
+
+                if (guess === target) {
+                    alert("恭喜你，猜对了！答案就是 " + target);
+                    break;
+                } else if (guess < target) {
+                    alert("太小了，再试一次！");
+                } else {
+                    alert("太大了，再试一次！");
+                }
+            }
+
+            if (attempts >= maxAttempts) {
+                alert("很遗憾，你没有在指定次数内猜中。正确答案是 " + target);
+            }
+        }
+
+
+     </script>
+</body>
+</html>

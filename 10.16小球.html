@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓小球游戏|函数的三个方法的应用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f8ff;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 24px;
+        }
+        #info {
+            padding: 16px;
+            background: #222;
+            color: #fff;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .ball {
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        button{
+            padding: 4px 12px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        当前分数：<span id="score">0</span>
+        剩余小球：<span id="remain">3</span>
+        <button id="restart">重新开始</button>
+    </div>
+
+    <script>
+        // const是常量指的是变量的引用地址不能变，不是对象里面的数据不能改。
+        const game = {
+            score: 0,
+            width: 50,
+            height: 50,
+            ballCount: 3,       // 小球总数量，可以修改，比如改成4、5
+            ballList: [],       // 存放所有小球信息 dom,x,y,isClick
+            timer: null,        // 定时换位置的定时器
+            isOver: false       // 游戏是否结束
+        };
+
+        // 问题：如果不减去小球的宽度，直接写 Math.random() * window.innerWidth 会怎么样？
+        // 答：小球一部分会跑到屏幕外面，出现横向滚动条
+        // 检测两个小球是否会重叠交叉
+        function checkCollision(newX, newY, ballArr) {
+            // 小球半径
+            const r = game.width / 2;
+            for(let i = 0; i < ballArr.length; i++){
+                const b = ballArr[i];
+                // 圆心距离
+                const dx = newX + r - (b.x + r);
+                const dy = newY + r - (b.y + r);
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                // 圆心距离小于直径 → 重叠
+                if(dist < game.width){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 生成一个不与已有小球重叠的坐标
+        function getSafePos(ballArr){
+            const maxX = window.innerWidth - game.width;
+            const maxY = window.innerHeight - game.height;
+            let randomX, randomY;
+            // 循环获取，直到找到不重叠的位置
+            while(true){
+                randomX = Math.floor(Math.random() * maxX);
+                randomY = Math.floor(Math.random() * maxY);
+                if(!checkCollision(randomX, randomY, ballArr)){
+                    break;
+                }
+            }
+            return {x:randomX, y:randomY};
+        }
+
+        // 批量生成小球，互不交叉
+        function createBalls(){
+            // 先清空旧小球
+            game.ballList.forEach(item=>{
+                item.dom.remove();
+            })
+            game.ballList = [];
+
+            for(let i = 0; i < game.ballCount; i++){
+                const pos = getSafePos(game.ballList);
+                const div = document.createElement('div');
+                div.className = "ball";
+                div.style.left = pos.x + "px";
+                div.style.top = pos.y + "px";
+                document.body.appendChild(div);
+
+                const ballItem = {
+                    dom: div,
+                    x: pos.x,
+                    y: pos.y,
+                    isClick: false //标记是否已经被点击
+                }
+                game.ballList.push(ballItem);
+
+                // 小球点击事件
+                div.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    if(game.isOver) return;
+                    // 找到当前点击的小球
+                    const curr = game.ballList.find(b=>b.dom === div);
+                    if(curr.isClick) return;
+                    curr.isClick = true;
+                    game.score += 2;
+                    updateScore();
+                    // 变色，call演示this（函数call方法）
+                    randomColor.call(this);
+                    // 判断是不是全部点完了
+                    checkWin();
+                })
+            }
+            updateRemain();
+        }
+
+        // 全部小球定时重新随机换位（换位依然保证不交叉）
+        function moveAllBall(){
+            if(game.isOver) return;
+            // 重置所有小球为未点击！一旦换位，本轮没点完直接失败
+            for(let item of game.ballList){
+                if(!item.isClick){
+                    // 存在没有点击的小球，换位触发失败
+                    game.isOver = true;
+                    clearInterval(game.timer);
+                    alert("游戏失败！有小球没有及时点击！");
+                    return;
+                }
+            }
+            // 如果全部点完了，直接胜利，不需要换位
+            if(checkWin()) return;
+
+            // 全部点完才会走到这里，生成新一轮小球
+            createBalls();
+        }
+
+        // 更新分数，用arguments做演示，符合课堂注释要求
+        // 普通的函数存在函数提升：函数体在后面，函数的调用在前面，
+        // 有this、arguments：类数组对象，函数在调用时候传递过来的实参数字对象
+        function updateScore() {
+            document.getElementById("score").innerText = game.score;
+        }
+        // 更新剩余未点击小球数量
+        function updateRemain(){
+            const unClickNum = game.ballList.filter(b=>!b.isClick).length;
+            document.getElementById("remain").innerText = unClickNum;
+        }
+
+        // 【新增】随机换小球颜色，扩展功能
+        function randomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            this.style.background = `rgb(${r},${g},${b})`;
+        }
+
+        // 判断是否全部小球点击完成（胜利）
+        function checkWin(){
+            const allClicked = game.ballList.every(b=>b.isClick);
+            updateRemain();
+            if(allClicked){
+                game.isOver = true;
+                clearInterval(game.timer);
+                alert("🎉恭喜！全部小球点击完成，本轮成功！");
+                return true;
+            }
+            return false;
+        }
+
+        // 点击空白区域扣分
+        document.body.addEventListener("click", function (e) {
+            if(game.isOver) return;
+            game.score -= 1;
+            if(game.score < 0) game.score = 0;
+            updateScore();
+        });
+
+        // 窗口大小改变，重新生成小球
+        window.addEventListener("resize", function () {
+            if(!game.isOver){
+                createBalls();
+            }
+        });
+
+        // 重新开始游戏
+        document.getElementById('restart').onclick = function(){
+            clearInterval(game.timer);
+            game.score = 0;
+            game.isOver = false;
+            updateScore();
+            createBalls();
+            // 定时：2秒自动换位，你可以修改这个时间
+            game.timer = setInterval(moveAllBall, 2000);
+        }
+
+        // 初始化
+        createBalls();
+        game.timer = setInterval(moveAllBall, 2000);
+    </script>
+</body>
+</html>
