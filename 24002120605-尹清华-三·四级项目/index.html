@@ -1,0 +1,193 @@
+<!--
+学号：________
+姓名：________
+页面：Keep H5 日程页 index.html
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keep-日程</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="yin_wrap">
+  <!--顶部教练栏-->
+  <div class="yin_schedule_header">
+    <div class="yin_coach_name">卡卡教练 ▾</div>
+    <div class="yin_header_right">
+      <span class="yin_icon">⚡0</span>
+      <span class="yin_icon">⌚</span>
+      <span class="yin_icon">⚙</span>
+    </div>
+  </div>
+  <div class="yin_greet_text">
+    <p>Hi,力能扛鼎的_Keeperkvh5</p>
+    <h2>今天是周六，不妨试试做点新鲜的小活动呀</h2>
+  </div>
+
+  <!--目标卡片-->
+  <div class="yin_target_row">
+    <div class="yin_target_card">
+      <div class="yin_target_label">每天运动时长</div>
+      <div class="yin_target_num">0 / 20 <span class="yin_target_unit">分钟</span></div>
+      <button class="yin_target_btn">设置目标</button>
+    </div>
+    <div class="yin_target_card">
+      <div class="yin_target_label">运动保持健康</div>
+      <div class="yin_target_num">-- / --</div>
+      <button class="yin_target_btn">设置目标</button>
+    </div>
+  </div>
+
+  <!--我的日程 日历-->
+  <div class="yin_calendar_wrap">
+    <div class="yin_calendar_title">我的日程 <span class="yin_more">...</span></div>
+    <div class="yin_calendar_row">
+      <div class="yin_cal_day">
+        <div class="yin_circle">一</div>
+        <div>12</div>
+      </div>
+      <div class="yin_cal_day">
+        <div class="yin_circle">二</div>
+        <div>13</div>
+      </div>
+      <div class="yin_cal_day">
+        <div class="yin_circle">三</div>
+        <div>14</div>
+      </div>
+      <div class="yin_cal_day">
+        <div class="yin_circle">四</div>
+        <div>15</div>
+      </div>
+      <div class="yin_cal_day">
+        <div class="yin_circle">五</div>
+        <div>16</div>
+      </div>
+      <div class="yin_cal_day active">
+        <div class="yin_circle">今</div>
+        <div>17</div>
+      </div>
+      <div class="yin_cal_day">
+        <div class="yin_circle">日</div>
+        <div>18</div>
+      </div>
+    </div>
+  </div>
+
+  <!--最近常练-->
+  <div class="yin_recent_wrap">
+    <h3>最近常练</h3>
+    <div class="yin_recent_item">
+      <div class="yin_recent_img">图</div>
+      <div class="yin_recent_info">
+        <div class="yin_recent_title">有氧操·全身燃动</div>
+        <div class="yin_recent_sub">K2 初学 · 14分钟 · 69 ...</div>
+      </div>
+      <button class="yin_start_btn">开始</button>
+    </div>
+    <div class="yin_recent_item">
+      <div class="yin_recent_img">图</div>
+      <div class="yin_recent_info">
+        <div class="yin_recent_title">7分钟瘦脸瘦下巴...</div>
+        <div class="yin_recent_sub">K1 零基础 · 7分钟 · 17 ...</div>
+      </div>
+      <button class="yin_start_btn">开始</button>
+    </div>
+    <div class="yin_recent_item">
+      <div class="yin_recent_img">图</div>
+      <div class="yin_recent_info">
+        <div class="yin_recent_title">7分肩膀练宽，拯...</div>
+        <div class="yin_recent_sub">K2 初学 · 7分钟 · 31 千卡</div>
+      </div>
+      <button class="yin_start_btn">开始</button>
+    </div>
+    <button class="yin_more_btn">查看更多</button>
+  </div>
+
+  <!--四个功能按钮-->
+  <div class="yin_four_btn">
+    <div class="yin_four_item">
+      <div class="yin_four_icon">目</div>
+      <div>我的计划</div>
+    </div>
+    <div class="yin_four_item">
+      <div class="yin_four_icon">▶</div>
+      <div>我的课程</div>
+    </div>
+    <div class="yin_four_item">
+      <div class="yin_four_icon">🗓</div>
+      <div>管理日程</div>
+    </div>
+    <div class="yin_four_item">
+      <div class="yin_four_icon">🔒</div>
+      <div>请假</div>
+    </div>
+  </div>
+
+  <!--与教练聊聊-->
+  <div class="yin_chat_wrap">
+    <div class="yin_chat_title">与教练聊聊</div>
+    <div class="yin_chat_item">今天抽空可以做些什么轻量活动? <span>↑</span></div>
+    <div class="yin_chat_item">傍晚吃点什么比较舒服又不添负担? <span>↑</span></div>
+    <div class="yin_chat_item">傍晚放松有什么简单快速的方法? <span>↑</span></div>
+    <div class="yin_chat_input">🔄 询问AI教练</div>
+  </div>
+
+  <!--快捷工具-->
+  <div class="yin_tool_title">快捷工具 <span>></span></div>
+  <div class="yin_tool_grid">
+    <div class="yin_tool_card">
+      <div class="yin_tool_icon">🍃</div>
+      <div>饮食</div>
+      <div class="yin_tool_data">0 / 2314 千卡</div>
+      <button class="yin_tool_btn">去记录</button>
+    </div>
+    <div class="yin_tool_card">
+      <div class="yin_tool_icon">🌙</div>
+      <div>睡眠</div>
+      <div class="yin_tool_data">0 小时 0 分钟</div>
+      <button class="yin_tool_btn">去记录</button>
+    </div>
+    <div class="yin_tool_card">
+      <div class="yin_tool_icon">👤</div>
+      <div>身材体型评估</div>
+      <div class="yin_tool_desc">告别脂肪堆积，精准雕...</div>
+      <button class="yin_tool_btn">去评估</button>
+    </div>
+    <div class="yin_tool_card">
+      <div class="yin_tool_icon">🧍</div>
+      <div>全身体态评估</div>
+      <div class="yin_tool_desc">告别僵硬酸痛，重塑健...</div>
+      <button class="yin_tool_btn">去评估</button>
+    </div>
+  </div>
+  <div class="yin_bottom_space"></div>
+</div>
+
+<!--底部导航-->
+<nav class="yin_tab">
+  <a href="category.html" class="yin_tab_item">
+    <span class="yin_tab_icon">📖</span>
+    <span>课程</span>
+  </a>
+  <a href="index.html" class="yin_tab_item active">
+    <span class="yin_tab_icon">🗓</span>
+    <span>日程</span>
+  </a>
+  <a href="sport.html" class="yin_tab_item">
+    <span class="yin_tab_icon">🏃</span>
+    <span>运动</span>
+  </a>
+  <a href="discover.html" class="yin_tab_item">
+    <span class="yin_tab_icon">🌐</span>
+    <span>发现</span>
+  </a>
+  <a href="mine.html" class="yin_tab_item">
+    <span class="yin_tab_icon">👤</span>
+    <span>我的</span>
+  </a>
+</nav>
+</body>
+</html>
