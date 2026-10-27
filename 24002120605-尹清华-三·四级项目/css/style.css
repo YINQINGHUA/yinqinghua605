@@ -144,3 +144,47 @@ body{background:#f7f7f7;color:#222;}
 .yin_tip_text h2{font-size:32px;margin-bottom:12px;}
 .yin_tip_text p{color:#777;margin-bottom:24px;font-size:16px;}
 .yin_start_big_btn{width:100%;padding:16px;border:2px solid #34c759;background:#fff;color:#34c759;border-radius:30px;font-size:20px;}
+/* 五个圆形功能入口 */
+.yin_category_circle_func {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: #fff;
+    margin: 0 16px 16px;
+    border-radius: 12px;
+}
+
+.yin_circle_item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 11px;
+    color: #333;
+    flex: 1;
+}
+
+.yin_circle_icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.yin_svg_icon {
+    width: 30px;
+    height: 30px;
+    fill: #fff;
+    /* 核心！缩放图标内部图形，消除图标自带留白 */
+    transform: scale(1.4);
+}
+
+/* 五个圆形背景色 */
+.yin_circle_green  { background: #34c759; }
+.yin_circle_blue   { background: #1677ff; }
+.yin_circle_purple { background: #a855f7; }
+.yin_circle_indigo { background: #4f46e5; }
+.yin_circle_red    { background: #ef4444; }
