@@ -123,3 +123,167 @@
 更新提交到gitee的24002120605-尹清华-三·四级项目
 
 **执行说明：** 该项目变更：category.html、css/style.css 修改（+81/-12），新增 iconfont 字体文件夹 font_5235509_4nyfm9bwrg7（8 个文件 65KB）——全部暂存提交并推送。
+
+---
+
+## 2026-10-28 12:49:50 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+将 catch-the-ball.html 游戏的小球点击时间加长点，然后添加1个小球点击扣分，然后再帮我将这个游戏生成的有趣点
+
+**执行计划：** ① 自动刷新 3 秒→5 秒；② 新增红色"✕"扣分球（点中 -3、断连击），场上 ≥2 球时恒有 1 个；③ 趣味增强：2.5 秒连击加成（每层 +1，上限 +5）、Web Audio 简单音效、小球弹出动画、红球脉冲警示、结算称号（传奇球王/反应高手/渐入佳境/再接再厉）。所有新增命名保持 yqh_ 前缀。
+
+**执行结果：** 已完成全部改动，浏览器实测 8 项全部通过：初始/强制 3 球时红球恰 1 个；点红球 -3 保底 0 且红球数恒定；连击两次得分 2+3=5 且"🔥 连击 x2"提示可见；强制结束显示称号；再来一局正常重置；控制台无报错。
+
+---
+
+## 2026-10-28 12:59:59 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+小球有三个
+
+**执行计划：** 小球总数固定为 3（1 个红色扣分球 + 2 个普通球），不再随机 1~3——修改 startGame 初始生成与 timeoutBall 超时刷新两处 fillBalls 调用为固定 3，并同步更新注释。
+
+---
+
+## 2026-10-28 13:24:31 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在添加一个彩色球，只出现每次只出现1秒钟，这个加5分。蓝色小球会随时间的刷新速度提升，蓝球最多五个
+
+**执行计划：** ① 彩色星标球：彩虹渐变+色相旋转动画，每隔约 9 秒出现一次、只停留 1 秒，点中 +5；② 蓝球每 20 秒 +1 个（上限 5 个），自动刷新时间每 20 秒缩短 0.5 秒（下限 2 秒），红球保持 1 个。所有新增命名保持 yqh_ 前缀。
+
+**执行结果：** 已完成全部改动，浏览器实测通过：初始 3 球（2 蓝+1 红）、blueTarget=2；模拟中期 fillBalls 后 6 球（5 蓝+1 红，上限生效）；程序化复核彩球点中恰 +5 并消失、1 秒超时自动消失；再来一局完整重置（balls=3、timeout=5000、无残留彩球）；控制台无报错。此前两处 FAIL 经复核确认为测试工具时机假象。
+
+---
+
+## 2026-10-28 14:39:59 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+完成 starter-level1.html 的 5 个功能：班级概览统计（4 张统计卡）、学生卡片列表渲染、不及格预警、按姓名或学号搜索、按总分降序/学号升序排序。考察 DOM 查找与数组方法，数据在 data.js。
+
+**执行说明：** 该文件为固定教学模板（HTML 结构、id、函数名均已在骨架中约定），故保留模板原命名而非 yqh_ 前缀（yqh_ 规则适用于自由创作的新代码）；按 TODO 注释与模板 CSS 类实现全部 9 个函数（4 个工具函数 + 5 个必做函数）。
+
+**执行结果：** 浏览器实测 6 项全部通过：统计卡 18 人/总分 7559/均分 84/及格率 83%；18 张学生卡片，第一名周诗涵，前 3 名金色徽章，不及格卷 3 份、满分卷 1 份；不及格预警 3 行（刘子涵、孙博文、黄宇轩）；搜"张"过滤 1 人、搜"2024"命中 18 人；按学号排序首位 2024001 且按钮高亮切换；控制台无报错。
+
+---
+
+## 2026-10-30 13:14:01 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+这几个分别用来dom查找的什么方式，怎么操作的
+
+**执行说明：** 纯讲解任务（不改代码）：梳理 starter-level1.html 中用到的 DOM 查找与操作方式（getElementById / querySelectorAll / closest / createElement+appendChild / innerHTML / firstChild.textContent / classList / setAttribute），用图解方式输出方法地图与事件委托机制说明。
+
+---
+
+## 2026-10-30 14:12:44 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+Trae 打开文件夹，进入用户根目录。获得 git 公钥，没有则先创建一个
+
+**执行计划：** 检查 C:\Users\Lenovo\.ssh 下是否已有 SSH 密钥（无）→ 用 ssh-keygen 生成 ed25519 密钥对（空口令）→ 展示公钥内容供添加到 Gitee。
+
+**执行结果：** 已生成 C:\Users\Lenovo\.ssh\id_ed25519（私钥）与 id_ed25519.pub（公钥，注释 yinqinghua-gitee），空口令验证通过。注：PowerShell 5.1 会丢弃空字符串参数，-N "" 需写成 -N '""'。公钥已展示给用户，待其添加到 Gitee。
+
+---
+
+## 2026-10-30 14:22:59 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+好的，已添加到 Gitee，请验证连接并切换远程地址
+
+**执行计划：** ssh-keyscan 预置 gitee.com 主机指纹 → ssh -T git@gitee.com 验证认证 → git remote set-url 切换为 git@gitee.com:neusoft_wangyao_jsj/webprojectyinqinghua.git → git ls-remote 实测拉取权限。
+
+**执行结果（阶段性）：** ssh-keyscan 已预置主机指纹；ssh -T 认证失败 Permission denied (publickey)。ssh -v 确认客户端已正确提供 id_ed25519（指纹 SHA256:IJAdsszwMwDNNE4z+P0eUADRtrR9RvG4hQPvvLluN14 / MD5:f8:3e:58:42:a0:0c:8d:65:70:bb:c4:b8:88:eb:0f:28），本地公钥与私钥配对无误，问题在 Gitee 端：公钥未成功保存/激活（可能未完成密码确认、粘贴不完整或贴成私钥）。已指导用户核对后重试，远程地址暂未切换（保持 HTTPS 可推送）。
+
+---
+
+## 2026-10-30 13:29:09 | 模型：big-pickle
+
+**提示词：**
+
+Create or update `AGENTS.md` for this repository.
+
+The goal is a compact instruction file that helps future OpenCode sessions avoid mistakes and ramp up quickly. Every line should answer: "Would an agent likely miss this without help?" If not, leave it out.
+
+User-provided focus or constraints (honor these):
+
+## How to investigate
+
+Read the highest-value sources first:
+- `README*`, root manifests, workspace config, lockfiles
+- build, test, lint, formatter, typecheck, and codegen config
+- CI workflows and pre-commit / task runner config
+- existing instruction files (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.cursorrules`, `.github/copilot-instructions.md`)
+- repo-local OpenCode config such as `opencode.json`
+
+If architecture is still unclear after reading config and docs, inspect a small number of representative code files to find the real entrypoints, package boundaries, and execution flow. Prefer reading the files that explain how the system is wired together over random leaf files.
+
+Prefer executable sources of truth over prose. If docs conflict with config or scripts, trust the executable source and only keep what you can verify.
+
+## What to extract
+
+Look for the highest-signal facts for an agent working in this repo:
+- exact developer commands, especially non-obvious ones
+- how to run a single test, a single package, or a focused verification step
+- required command order when it matters, such as `lint -> typecheck -> test`
+- monorepo or multi-package boundaries, ownership of major directories, and the real app/library entrypoints
+- framework or toolchain quirks: generated code, migrations, codegen, build artifacts, special env loading, dev servers, infra deploy flow
+- repo-specific style or workflow conventions that differ from defaults
+- testing quirks: fixtures, integration test prerequisites, snapshot workflows, required services, flaky or expensive suites
+- important constraints from existing instruction files worth preserving
+
+Good `AGENTS.md` content is usually hard-earned context that took reading multiple files to infer.
+
+## Questions
+
+Only ask the user questions if the repo cannot answer something important. Use the `question` tool for one short batch at most.
+
+Good questions:
+- undocumented team conventions
+- branch / PR / release expectations
+- missing setup or test prerequisites that are known but not written down
+
+Do not ask about anything the repo already makes clear.
+
+## Writing rules
+
+Include only high-signal, repo-specific guidance such as:
+- exact commands and shortcuts the agent would otherwise guess wrong
+- architecture notes that are not obvious from filenames
+- conventions that differ from language or framework defaults
+- setup requirements, environment quirks, and operational gotchas
+- references to existing instruction sources that matter
+
+Exclude:
+- generic software advice
+- long tutorials or exhaustive file trees
+- obvious language conventions
+- speculative claims or anything you could not verify
+- content better stored in another file referenced via `opencode.json` `instructions`
+
+When in doubt, omit.
+
+Prefer short sections and bullets. If the repo is simple, keep the file simple. If the repo is large, summarize the few structural facts that actually change how an agent should work.
+
+If `AGENTS.md` already exists at `D:\高级网页设计`, improve it in place rather than rewriting blindly. Preserve verified useful guidance, delete fluff or stale claims, and reconcile it with the current codebase.
+
+**执行说明：** 调研仓库结构、README、skill 规则、git 配置与代表性页面后，在仓库根创建 `AGENTS.md`，沉淀纯静态多项目结构、yqh_ 命名/提示词先记录/返回首页链接等强制约定、本地图标资源、Gitee 推送与中文编码注意事项。
+
+---
+
+## 2026-10-30 14:34:10 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+创建技能skill：提交到github，将本项目提交commit并push到`https://github.com/YINQINGHUA/yinqinghua605`，使用已设置公钥
+
+**执行计划：** (1) 在 24002120605尹清华/.trae/skills/ 新建 yqh-github-submit 技能，沉淀 GitHub 提交流程（SSH 公钥认证、远程地址 git@github.com:YINQINGHUA/yinqinghua605.git）；(2) git status/diff 核对变更后 commit 全部改动；(3) 添加 github 远程（SSH 方式）push 到 master 分支，验证本地与远程一致。

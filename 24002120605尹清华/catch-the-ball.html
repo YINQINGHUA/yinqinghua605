@@ -86,6 +86,56 @@ body {
     transform: scale(0);
     opacity: 0;
 }
+/* 新球弹出动画 */
+.yqh_ball.yqh_spawn {
+    animation: yqh_popIn 0.25s ease-out;
+}
+@keyframes yqh_popIn {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+}
+/* 扣分小球：红色脉冲警示 */
+.yqh_ball.yqh_bad {
+    background: #FF4444;
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: yqh_badPulse 1s infinite;
+}
+@keyframes yqh_badPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 0 rgba(255,68,68,0.55); }
+    50%      { box-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 14px rgba(255,68,68,0); }
+}
+/* 彩色特殊球：彩虹渐变 + 色相旋转，只出现 1 秒，点中 +5 */
+.yqh_ball.yqh_rainbow {
+    background: linear-gradient(135deg, #FF66CC, #FFD700, #66FF99, #66CCFF);
+    color: #fff;
+    font-size: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: yqh_rainbowSpin 0.8s linear infinite;
+}
+@keyframes yqh_rainbowSpin {
+    0%   { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+/* 连击提示 */
+#yqh_combo {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #FF8C00;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    z-index: 40;
+    display: none;
+}
 
 /* ===== 加分/扣分飘字 ===== */
 .yqh_float-text {
@@ -146,17 +196,27 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
     </div>
 
     <button id="yqh_startBtn">开始游戏</button>
+    <div id="yqh_combo"></div>
 
     <div id="yqh_overlay" class="yqh_hidden">
         <h1>🎉 Game Over</h1>
         <p>最终分数：<span id="yqh_finalScore">0</span></p>
+        <p id="yqh_rating"></p>
         <button id="yqh_restartBtn">再来一局</button>
     </div>
 
     <script>
         // ===== 游戏常量（规则：所有 JS 变量以 yqh_ 开头） =====
         const yqh_ballSize = 60;        // 小球直径
-        const yqh_ballTimeout = 3000;   // 3秒未点自动刷新
+        const yqh_baseBallTimeout = 5000; // 蓝球初始自动刷新时间
+        const yqh_minBallTimeout = 2000;  // 蓝球刷新时间下限（随时间加速）
+        const yqh_blueMax = 5;            // 蓝球数量上限
+        const yqh_growthInterval = 20000; // 每 20 秒提升一次难度
+        const yqh_rainbowScore = 5;       // 点中彩色球的得分
+        const yqh_rainbowLife = 1000;     // 彩色球只出现 1 秒
+        const yqh_rainbowInterval = 9000; // 彩色球每隔约 9 秒出现一次
+        const yqh_badPenalty = 3;       // 点中红色扣分球的扣分
+        const yqh_comboWindow = 2500;   // 连击有效时间窗口（毫秒）
         const yqh_topBarHeight = 48;    // 顶栏高度
         const yqh_gameDuration = 120;   // 2分钟 = 120秒
 
@@ -167,6 +227,15 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
         let yqh_balls = [];             // [{ yqh_id, yqh_dom, yqh_x, yqh_y, yqh_timeoutId }]
         let yqh_nextId = 1;
         let yqh_countdownTimer = null;
+        let yqh_combo = 0;              // 当前连击数
+        let yqh_lastHitTime = 0;        // 上次点中普通球的时间戳
+        let yqh_comboHideTimer = null;  // 连击提示自动隐藏计时器
+        let yqh_audioCtx = null;        // 音效上下文（首次点击时创建）
+        let yqh_blueTarget = 2;         // 场上普通蓝球目标数（随时间增长，最多 5）
+        let yqh_currentTimeout = 5000;  // 当前蓝球自动刷新时间（随游戏进程缩短）
+        let yqh_growthTimer = null;     // 难度增长计时器
+        let yqh_rainbowTimer = null;    // 彩色球出现计时器
+        let yqh_rainbowBall = null;     // 当前场上的彩色球
 
         // ===== DOM 引用 =====
         let yqh_scoreEl = null;
@@ -175,6 +244,8 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
         let yqh_restartBtn = null;
         let yqh_overlayEl = null;
         let yqh_finalScoreEl = null;
+        let yqh_comboEl = null;
+        let yqh_ratingEl = null;
 
         // ===== 初始化 =====
         function yqh_init() {
@@ -184,6 +255,8 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             yqh_restartBtn = document.getElementById('yqh_restartBtn');
             yqh_overlayEl = document.getElementById('yqh_overlay');
             yqh_finalScoreEl = document.getElementById('yqh_finalScore');
+            yqh_comboEl = document.getElementById('yqh_combo');
+            yqh_ratingEl = document.getElementById('yqh_rating');
 
             yqh_startBtn.addEventListener('click', function (yqh_e) {
                 yqh_e.stopPropagation(); // 开始按钮的点击不算"点空白"
@@ -208,9 +281,14 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             yqh_overlayEl.classList.add('yqh_hidden');
             yqh_updateScore();
             yqh_updateTime();
-            // 初始随机生成 1~3 个小球
-            yqh_fillBalls(Math.floor(Math.random() * 3) + 1);
+            yqh_resetCombo();
+            yqh_blueTarget = 2;                     // 初始 2 个蓝球
+            yqh_currentTimeout = yqh_baseBallTimeout;
+            // 初始生成小球（2 个普通球 + 1 个红色扣分球）
+            yqh_fillBalls();
             yqh_startCountdown();
+            yqh_startGrowth();
+            yqh_startRainbow();
         }
 
         function yqh_restartGame() {
@@ -221,9 +299,14 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
         function yqh_endGame() {
             yqh_state = 'ended';
             yqh_stopCountdown();
-            yqh_clearAllBalls();   // 清除所有小球及其 3 秒计时器，防止"幽灵球"
+            yqh_clearAllBalls();   // 清除所有小球及其自动刷新计时器，防止"幽灵球"
+            yqh_stopGrowth();
+            yqh_clearRainbow();
             yqh_timeEl.classList.remove('yqh_danger');
             yqh_finalScoreEl.innerText = yqh_score;
+            yqh_ratingEl.innerText = yqh_getRating(yqh_score);
+            yqh_resetCombo();
+            yqh_playTone(180, 0.5, 'sawtooth'); // 结束低音
             yqh_overlayEl.classList.remove('yqh_hidden');
         }
 
@@ -246,17 +329,33 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
         }
 
         // ===== 小球管理 =====
-        // 补充小球直到数量达到目标（只增不删）
-        function yqh_fillBalls(yqh_target) {
-            while (yqh_balls.length < yqh_target) {
-                yqh_createBall();
+        // 补充小球：普通蓝球补到目标数，红色扣分球保持 1 个
+        // 蓝球目标数随游戏进程增长（最多 5 个），刷新速度随时间提升
+        function yqh_fillBalls() {
+            while (yqh_countNormal() < yqh_blueTarget) {
+                yqh_createBall(false);
+            }
+            if (!yqh_hasBadBall()) {
+                yqh_createBall(true);
             }
         }
 
-        function yqh_createBall() {
+        function yqh_countNormal() {
+            return yqh_balls.filter(function (yqh_b) { return !yqh_b.yqh_isBad; }).length;
+        }
+
+        function yqh_hasBadBall() {
+            return yqh_balls.some(function (yqh_b) { return yqh_b.yqh_isBad; });
+        }
+
+        function yqh_createBall(yqh_isBad) {
             const yqh_pos = yqh_getSafePosition();
             const yqh_div = document.createElement('div');
-            yqh_div.className = 'yqh_ball';
+            yqh_div.className = 'yqh_ball yqh_spawn';
+            if (yqh_isBad) {
+                yqh_div.classList.add('yqh_bad');
+                yqh_div.innerText = '✕';
+            }
             yqh_div.style.left = yqh_pos.yqh_x + 'px';
             yqh_div.style.top = yqh_pos.yqh_y + 'px';
             document.body.appendChild(yqh_div);
@@ -264,6 +363,7 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             const yqh_ball = {
                 yqh_id: yqh_nextId++,
                 yqh_dom: yqh_div,
+                yqh_isBad: !!yqh_isBad,
                 yqh_x: yqh_pos.yqh_x,
                 yqh_y: yqh_pos.yqh_y,
                 yqh_timeoutId: null
@@ -275,12 +375,15 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
                 yqh_hitBall(yqh_ball.yqh_id, yqh_e);
             });
 
-            // 3 秒未点击 → 自动消失并刷新
+            // 超时未点击 → 自动消失并刷新
             yqh_ball.yqh_timeoutId = setTimeout(function () {
                 yqh_timeoutBall(yqh_ball.yqh_id);
-            }, yqh_ballTimeout);
+            }, yqh_currentTimeout);
 
             yqh_balls.push(yqh_ball);
+
+            // 弹出动画结束后移除 spawn 类，避免与点击动画冲突
+            setTimeout(function () { yqh_div.classList.remove('yqh_spawn'); }, 300);
         }
 
         // 点中小球：+2 分
@@ -293,19 +396,38 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             yqh_balls = yqh_balls.filter(function (yqh_b) { return yqh_b.yqh_id !== yqh_id; });
             clearTimeout(yqh_ball.yqh_timeoutId);
 
-            yqh_score += 2;
-            yqh_updateScore();
-            yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '+2', '#32CD32');
+            // 红色扣分球：扣 3 分并断连击
+            if (yqh_ball.yqh_isBad) {
+                yqh_score = Math.max(0, yqh_score - yqh_badPenalty);
+                yqh_updateScore();
+                yqh_resetCombo();
+                yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '-' + yqh_badPenalty, '#FF4444');
+                yqh_flashRed();
+                yqh_playTone(140, 0.3, 'sawtooth');
+            } else {
+                // 连击加成：2.5 秒内连续点中普通球，额外 +1/层（上限 +5）
+                const yqh_now = Date.now();
+                yqh_combo = (yqh_now - yqh_lastHitTime <= yqh_comboWindow) ? yqh_combo + 1 : 1;
+                yqh_lastHitTime = yqh_now;
+                const yqh_bonus = Math.min(yqh_combo - 1, 5);
+                const yqh_gain = 2 + yqh_bonus;
+
+                yqh_score += yqh_gain;
+                yqh_updateScore();
+                yqh_updateCombo();
+                yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '+' + yqh_gain, '#32CD32');
+                yqh_playTone(660 + yqh_bonus * 80, 0.08, 'triangle');
+            }
 
             // 表现层：缩小淡出动画后再移除 DOM
             yqh_ball.yqh_dom.classList.add('yqh_hit');
             setTimeout(function () { yqh_ball.yqh_dom.remove(); }, 300);
 
-            // 1:1 补一个新球，总数保持不变
-            yqh_fillBalls(yqh_balls.length + 1);
+            // 1:1 补一个新球，蓝球与红球数量保持不变
+            yqh_fillBalls();
         }
 
-        // 3 秒超时：小球自动消失，总数重新随机 1~3
+        // 超时：小球自动消失并补齐
         function yqh_timeoutBall(yqh_id) {
             if (yqh_state !== 'playing') return;
             const yqh_ball = yqh_findBall(yqh_id);
@@ -314,8 +436,8 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             yqh_ball.yqh_dom.remove();
             yqh_balls = yqh_balls.filter(function (yqh_b) { return yqh_b.yqh_id !== yqh_id; });
 
-            // 只有超时刷新才重新随机总数，带来玩法变化
-            yqh_fillBalls(Math.floor(Math.random() * 3) + 1);
+            // 超时刷新后补齐蓝球与红球
+            yqh_fillBalls();
         }
 
         // 清除所有小球：先 clearTimeout 再移除 DOM，防止残留计时器
@@ -329,6 +451,104 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
 
         function yqh_findBall(yqh_id) {
             return yqh_balls.find(function (yqh_b) { return yqh_b.yqh_id === yqh_id; });
+        }
+
+        // ===== 难度增长与彩色球 =====
+        // 每 20 秒：蓝球 +1（最多 5 个），自动刷新时间 -0.5 秒（下限 2 秒）
+        function yqh_startGrowth() {
+            yqh_stopGrowth();
+            yqh_growthTimer = setInterval(function () {
+                if (yqh_state !== 'playing') return;
+                if (yqh_blueTarget < yqh_blueMax) {
+                    yqh_blueTarget++;
+                }
+                yqh_currentTimeout = Math.max(yqh_minBallTimeout, yqh_currentTimeout - 500);
+                yqh_fillBalls();
+            }, yqh_growthInterval);
+        }
+
+        function yqh_stopGrowth() {
+            if (yqh_growthTimer) {
+                clearInterval(yqh_growthTimer);
+                yqh_growthTimer = null;
+            }
+        }
+
+        // 彩色球：每隔约 9 秒出现一次，只停留 1 秒，点中 +5
+        function yqh_startRainbow() {
+            yqh_clearRainbow();
+            yqh_rainbowTimer = setInterval(function () {
+                if (yqh_state !== 'playing') return;
+                if (!yqh_rainbowBall) {
+                    yqh_spawnRainbow();
+                }
+            }, yqh_rainbowInterval);
+        }
+
+        function yqh_spawnRainbow() {
+            const yqh_pos = yqh_getSafePosition();
+            const yqh_div = document.createElement('div');
+            yqh_div.className = 'yqh_ball yqh_rainbow yqh_spawn';
+            yqh_div.innerText = '★';
+            yqh_div.style.left = yqh_pos.yqh_x + 'px';
+            yqh_div.style.top = yqh_pos.yqh_y + 'px';
+            document.body.appendChild(yqh_div);
+
+            const yqh_rb = {
+                yqh_dom: yqh_div,
+                yqh_timeoutId: null
+            };
+
+            yqh_div.addEventListener('click', function (yqh_e) {
+                yqh_e.stopPropagation();
+                yqh_hitRainbow(yqh_rb, yqh_e);
+            });
+
+            // 1 秒后自动消失
+            yqh_rb.yqh_timeoutId = setTimeout(function () {
+                yqh_removeRainbow(yqh_rb);
+            }, yqh_rainbowLife);
+
+            yqh_rainbowBall = yqh_rb;
+        }
+
+        // 点中彩色球：+5 分
+        function yqh_hitRainbow(yqh_rb, yqh_e) {
+            if (yqh_state !== 'playing') return;
+            if (yqh_rainbowBall !== yqh_rb) return; // 已消失，防止重复计分
+
+            yqh_rainbowBall = null;
+            clearTimeout(yqh_rb.yqh_timeoutId);
+
+            yqh_score += yqh_rainbowScore;
+            yqh_updateScore();
+            yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '+' + yqh_rainbowScore, '#FF8C00');
+            yqh_playTone(990, 0.15, 'triangle');
+
+            // 缩小淡出后移除 DOM
+            yqh_rb.yqh_dom.classList.add('yqh_hit');
+            setTimeout(function () { yqh_rb.yqh_dom.remove(); }, 300);
+        }
+
+        function yqh_removeRainbow(yqh_rb) {
+            if (yqh_rainbowBall === yqh_rb) {
+                yqh_rainbowBall = null;
+            }
+            clearTimeout(yqh_rb.yqh_timeoutId);
+            yqh_rb.yqh_dom.remove();
+        }
+
+        // 清理彩色球及其计时器（结束时/重开时调用）
+        function yqh_clearRainbow() {
+            if (yqh_rainbowTimer) {
+                clearInterval(yqh_rainbowTimer);
+                yqh_rainbowTimer = null;
+            }
+            if (yqh_rainbowBall) {
+                clearTimeout(yqh_rainbowBall.yqh_timeoutId);
+                yqh_rainbowBall.yqh_dom.remove();
+                yqh_rainbowBall = null;
+            }
         }
 
         // ===== 位置计算 =====
@@ -364,9 +584,14 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             if (yqh_state !== 'playing') return;
             yqh_score = Math.max(0, yqh_score - 1); // 保底 0 分
             yqh_updateScore();
+            yqh_resetCombo();
             yqh_showFloatingText(yqh_e.clientX, yqh_e.clientY, '-1', '#FF4444');
+            yqh_flashRed();
+            yqh_playTone(220, 0.1, 'sine');
+        }
 
-            // 背景闪红 200ms
+        // 背景闪红 200ms
+        function yqh_flashRed() {
             document.body.classList.remove('yqh_flash-red');
             void document.body.offsetWidth; // 强制重绘，让动画可以连续触发
             document.body.classList.add('yqh_flash-red');
@@ -393,6 +618,14 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             return yqh_m + ':' + (yqh_s < 10 ? '0' + yqh_s : yqh_s);
         }
 
+        // 根据分数给出结算称号
+        function yqh_getRating(yqh_score) {
+            if (yqh_score >= 120) return '🏆 传奇球王';
+            if (yqh_score >= 80)  return '🔥 反应高手';
+            if (yqh_score >= 40)  return '👍 渐入佳境';
+            return '💪 再接再厉';
+        }
+
         // 在点击位置生成飘字，800ms 后移除
         function yqh_showFloatingText(yqh_x, yqh_y, yqh_text, yqh_color) {
             const yqh_el = document.createElement('div');
@@ -403,6 +636,46 @@ body.yqh_flash-red { animation: yqh_flashRed 0.2s ease-out; }
             yqh_el.style.color = yqh_color;
             document.body.appendChild(yqh_el);
             setTimeout(function () { yqh_el.remove(); }, 800);
+        }
+
+        // 更新连击提示：≥2 连击时显示，连击窗口过后自动隐藏
+        function yqh_updateCombo() {
+            if (yqh_combo >= 2) {
+                yqh_comboEl.innerText = '🔥 连击 x' + yqh_combo;
+                yqh_comboEl.style.display = 'block';
+            }
+            clearTimeout(yqh_comboHideTimer);
+            yqh_comboHideTimer = setTimeout(yqh_resetCombo, yqh_comboWindow);
+        }
+
+        function yqh_resetCombo() {
+            yqh_combo = 0;
+            if (yqh_comboEl) {
+                yqh_comboEl.style.display = 'none';
+            }
+            clearTimeout(yqh_comboHideTimer);
+        }
+
+        // ===== 简单音效（Web Audio，无需素材文件） =====
+        function yqh_playTone(yqh_freq, yqh_seconds, yqh_type) {
+            try {
+                if (!yqh_audioCtx) {
+                    yqh_audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (yqh_audioCtx.state === 'suspended') {
+                    yqh_audioCtx.resume();
+                }
+                const yqh_osc = yqh_audioCtx.createOscillator();
+                const yqh_gain = yqh_audioCtx.createGain();
+                yqh_osc.type = yqh_type;
+                yqh_osc.frequency.value = yqh_freq;
+                yqh_gain.gain.setValueAtTime(0.15, yqh_audioCtx.currentTime);
+                yqh_gain.gain.exponentialRampToValueAtTime(0.001, yqh_audioCtx.currentTime + yqh_seconds);
+                yqh_osc.connect(yqh_gain);
+                yqh_gain.connect(yqh_audioCtx.destination);
+                yqh_osc.start();
+                yqh_osc.stop(yqh_audioCtx.currentTime + yqh_seconds);
+            } catch (yqh_err) { /* 音效失败不影响游戏 */ }
         }
 
         // 窗口缩放后重新给所有小球安排安全位置
