@@ -421,3 +421,15 @@ SUV不点击是这样的，请修改（附 SUV 未选中态特写截图）
 将24002120605尹清华里面的内容全部提交上去，强覆盖
 
 **执行计划：** git status 核对（该目录无未提交改动，代码均在 6b0a3a8/d701f48/4af804d 中），按用户明确要求执行 git push --force github master 用本地强制覆盖远程，验证远程与本地一致。
+
+**执行说明：** 已提交 c69aa0b（本条记录 +10 行）并按用户要求 git push --force 覆盖推送成功，远程 refs/heads/master 与本地 HEAD 均为 c69aa0b。
+
+---
+
+## 2026-11-04 14:45:45 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+将24002120605尹清华里的代码全部单独提交，不要以文件夹的形式，强覆盖
+
+**执行计划：** 把 24002120605尹清华/ 下全部被跟踪内容（cdn/css/font/js/skills 目录与所有 html、data.js、yqh_prompt.md）用 git mv 平铺到仓库根目录，.trae/skills 两个技能并入根 .trae/skills（无同名冲突），同步更新 AGENTS.md 仓库概览，commit 后按用户要求 git push --force 覆盖远程并验证。
