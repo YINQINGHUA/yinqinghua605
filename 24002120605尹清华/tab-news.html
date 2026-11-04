@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-04
+  使用大模型：GLM-5.3-Flash
+  功能名称：新闻选项卡（Tab）切换页——国内/省内/国际/最热四类新闻栏目切换
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻视线 · Tab 选项卡</title>
+    <style>
+        :root {
+            --yqh-paper: #f8f4ea;        /* 瓷纸底 */
+            --yqh-paper-deep: #efe8d8;   /* 页面深纸 */
+            --yqh-ink: #2c2a26;          /* 玄墨 */
+            --yqh-ink-light: #6f6a5e;    /* 淡墨 */
+            --yqh-cinnabar: #b5442d;     /* 朱砂（选中/强调） */
+            --yqh-indigo: #31547d;       /* 靛青（辅助） */
+            --yqh-line: #d8cfba;         /* 细线 */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
+            background: var(--yqh-paper-deep);
+            color: var(--yqh-ink);
+            line-height: 1.7;
+            padding: 32px 16px 64px;
+        }
+
+        .yqh_page {
+            max-width: 720px;
+            margin: 0 auto;
+            background: var(--yqh-paper);
+            border: 1px solid var(--yqh-line);
+            box-shadow: 0 2px 10px rgba(44, 42, 38, .08);
+            padding: 28px clamp(18px, 5vw, 40px) 36px;
+        }
+
+        /* 报头 */
+        .yqh_masthead {
+            border-bottom: 3px double var(--yqh-ink);
+            padding-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .yqh_masthead h1 {
+            font-family: "KaiTi", "Kaiti SC", "STKaiti", serif;
+            font-size: clamp(26px, 5vw, 34px);
+            letter-spacing: 6px;
+            font-weight: 700;
+        }
+        .yqh_masthead h1 span { color: var(--yqh-cinnabar); }
+        .yqh_masthead_info {
+            font-size: 12px;
+            color: var(--yqh-ink-light);
+            text-align: right;
+        }
+
+        /* 返回首页链接 */
+        .yqh_home {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--yqh-indigo);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+        .yqh_home:hover { border-bottom-color: var(--yqh-indigo); }
+
+        /* ===== 选项卡 ===== */
+        .yqh_tablist {
+            display: flex;
+            gap: 4px;
+            margin-top: 22px;
+            border-bottom: 1px solid var(--yqh-ink);
+            flex-wrap: wrap;
+        }
+        .yqh_tab {
+            appearance: none;
+            background: transparent;
+            border: none;
+            font: inherit;
+            font-size: 15px;
+            font-family: "KaiTi", "Kaiti SC", "STKaiti", serif;
+            letter-spacing: 2px;
+            color: var(--yqh-ink-light);
+            padding: 10px 16px 9px;
+            cursor: pointer;
+            position: relative;
+            transition: color .12s ease;
+        }
+        .yqh_tab::after {
+            content: "";
+            position: absolute;
+            left: 12px; right: 12px; bottom: -1px;
+            height: 3px;
+            background: var(--yqh-cinnabar);
+            transform: scaleX(0);
+            transition: transform .12s ease;
+        }
+        .yqh_tab:hover { color: var(--yqh-ink); }
+        .yqh_tab:focus-visible {
+            outline: 2px solid var(--yqh-indigo);
+            outline-offset: -2px;
+        }
+        .yqh_tab.yqh_active {
+            color: var(--yqh-cinnabar);
+            font-weight: 700;
+        }
+        .yqh_tab.yqh_active::after { transform: scaleX(1); }
+
+        /* 新闻面板 */
+        .yqh_panel { padding: 6px 4px; }
+        .yqh_panel[hidden] { display: none; }
+        .yqh_panel.yqh_active { animation: yqh_fadein .18s ease; }
+        @keyframes yqh_fadein {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        .yqh_news {
+            list-style: none;
+        }
+        .yqh_news li {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            padding: 12px 2px;
+            border-bottom: 1px dashed var(--yqh-line);
+            font-size: 15px;
+        }
+        .yqh_news li:last-child { border-bottom: none; }
+        .yqh_news time {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: var(--yqh-ink-light);
+            font-variant-numeric: tabular-nums;
+        }
+        .yqh_news a {
+            color: var(--yqh-ink);
+            text-decoration: none;
+        }
+        .yqh_news a:hover { color: var(--yqh-cinnabar); }
+        .yqh_tag {
+            flex-shrink: 0;
+            font-size: 11px;
+            color: var(--yqh-cinnabar);
+            border: 1px solid currentColor;
+            padding: 0 5px;
+            line-height: 1.5;
+        }
+
+        .yqh_foot {
+            margin-top: 30px;
+            border-top: 1px solid var(--yqh-line);
+            padding-top: 12px;
+            font-size: 12px;
+            color: var(--yqh-ink-light);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yqh_tab, .yqh_tab::after { transition: none; }
+            .yqh_panel.yqh_active { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <main class="yqh_page">
+        <header class="yqh_masthead">
+            <h1>新闻<span>视线</span></h1>
+            <p class="yqh_masthead_info">尹清华 · 高级网页设计课堂实践<br>Tab 选项卡案例 · 2026年11月4日</p>
+        </header>
+        <a class="yqh_home" href="index.html">← 返回首页</a>
+
+        <section class="yqh_tabs" data-yqh-tabs aria-label="新闻分类选项卡">
+            <div class="yqh_tablist" role="tablist">
+                <button class="yqh_tab yqh_active" type="button" role="tab" aria-selected="true">国内新闻</button>
+                <button class="yqh_tab" type="button" role="tab" aria-selected="false">省内新闻</button>
+                <button class="yqh_tab" type="button" role="tab" aria-selected="false">国际新闻</button>
+                <button class="yqh_tab" type="button" role="tab" aria-selected="false">最热新闻</button>
+            </div>
+
+            <!-- 国内新闻（默认选中） -->
+            <div class="yqh_panel yqh_active" role="tabpanel">
+                <ul class="yqh_news">
+                    <li><time>11-04</time><a href="#yqh_none">全国秋收进度过九成，粮食产量有望再创新高</a><span class="yqh_tag">要闻</span></li>
+                    <li><time>11-03</time><a href="#yqh_none">新一轮冷空气自西向东影响我国，中东部将有大风降温</a></li>
+                    <li><time>11-03</time><a href="#yqh_none">多地推出冬季文化旅游消费季活动，激发市场活力</a></li>
+                    <li><time>11-02</time><a href="#yqh_none">我国成功发射新型试验卫星，进入预定轨道</a><span class="yqh_tag">科技</span></li>
+                    <li><time>11-01</time><a href="#yqh_none">全国铁路实行新列车运行图，运力进一步提升</a></li>
+                </ul>
+            </div>
+
+            <!-- 省内新闻 -->
+            <div class="yqh_panel" role="tabpanel" hidden>
+                <ul class="yqh_news">
+                    <li><time>11-04</time><a href="#yqh_none">省内高校秋季运动会闭幕，多校打破赛会纪录</a></li>
+                    <li><time>11-03</time><a href="#yqh_none">我省新增三条高速互通线，通行效率明显提升</a><span class="yqh_tag">交通</span></li>
+                    <li><time>11-02</time><a href="#yqh_none">省科技馆举办青少年编程体验周，报名人数创新高</a></li>
+                    <li><time>11-01</time><a href="#yqh_none">省内多地启动冬季供暖调试，确保按时达标供热</a></li>
+                    <li><time>10-31</time><a href="#yqh_none">第十八届全省大学生程序设计竞赛落下帷幕</a><span class="yqh_tag">教育</span></li>
+                </ul>
+            </div>
+
+            <!-- 国际新闻 -->
+            <div class="yqh_panel" role="tabpanel" hidden>
+                <ul class="yqh_news">
+                    <li><time>11-04</time><a href="#yqh_none">多国代表就气候变化合作达成新一轮共识</a></li>
+                    <li><time>11-03</time><a href="#yqh_none">国际空间站完成新一批科学实验设备更换</a><span class="yqh_tag">科技</span></li>
+                    <li><time>11-02</time><a href="#yqh_none">欧洲多国推进冬季能源储备，市场供应趋于平稳</a></li>
+                    <li><time>11-01</time><a href="#yqh_none">全球数字经济峰会探讨人工智能治理框架</a></li>
+                    <li><time>10-30</time><a href="#yqh_none">跨国铁路货运班列开行数量同比稳步增长</a></li>
+                </ul>
+            </div>
+
+            <!-- 最热新闻 -->
+            <div class="yqh_panel" role="tabpanel" hidden>
+                <ul class="yqh_news">
+                    <li><time>11-04</time><a href="#yqh_none">"实验室开放日"活动走进社区，市民近距离体验科学</a><span class="yqh_tag">热</span></li>
+                    <li><time>11-04</time><a href="#yqh_none">数字阅读用户规模持续扩大，有声书增长显著</a><span class="yqh_tag">热</span></li>
+                    <li><time>11-03</time><a href="#yqh_none">城市马拉松报名火爆，组委会宣布扩容赛道</a><span class="yqh_tag">热</span></li>
+                    <li><time>11-03</time><a href="#yqh_none">冬季冰雪旅游预订量翻番，北方多城迎客流高峰</a></li>
+                    <li><time>11-02</time><a href="#yqh_none">新能源汽车充电网络覆盖全部县域城市</a></li>
+                </ul>
+            </div>
+        </section>
+
+        <footer class="yqh_foot">
+            <span>新闻选项卡 · JS 外部引用（js/yqh_tab.js）· 组件可复用</span>
+            <span>尹清华 24002120605</span>
+        </footer>
+    </main>
+
+    <!-- 选项卡逻辑：外部 JS 引用，路径 js/yqh_tab.js -->
+    <script src="js/yqh_tab.js"></script>
+</body>
+</html>

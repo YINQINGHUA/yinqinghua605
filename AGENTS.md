@@ -19,6 +19,18 @@
 - 第三方类名/API 不改名：`fa-solid`/`fa-brands`、`data-lucide`、`iconfont`/`icon-*`。
 - 例外：`starter-level1.html`、`starter-level2.html` 是固定教学模板（HTML 结构、id、函数名已约定），沿用模板命名，不要套 `yqh_`。
 - 每个新建 HTML 必须含返回首页链接 `<a class="yqh_home" href="index.html">← 返回首页</a>`；`<html lang="zh-CN">`、UTF-8、viewport；含固定底栏的页面加 `viewport-fit=cover`。
+- 每个新建 HTML 在 `<!DOCTYPE html>` 之后、`<head>` 之前加文件头注释，包含作者、建立时间、使用大模型、功能名称四项，格式：
+
+```html
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-04
+  使用大模型：GLM-5.3-Flash
+  功能名称：<一句话说明该页面功能>
+-->
+```
+
+- JS 中每个函数（`function` 声明、赋值给变量的函数表达式、对象方法）须在其上一行加注释，一句话说明主要实现的功能，如 `// yqh_fillBalls：清空场地后按当前难度生成指定数量的小球`；功能显而易见的单行箭头函数可省略。
 - `index.html` 的课堂目录是手动维护的卡片列表；新增页面时同步补一条入口。
 
 ## 本地资源（运行时不引外链）

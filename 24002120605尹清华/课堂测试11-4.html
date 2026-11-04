@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-04
+  使用大模型：GLM-5.3-Flash
+  功能名称：汽车资讯新闻选项卡——导购/3-9万/9-17万/17-42万/SUV 五栏目切换（按教材截图 1:1 还原）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂测试 11-4 新闻选项卡</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #fff;
+            font-family: SimSun, "Songti SC", serif;
+            padding: 40px 0 60px;
+        }
+
+        /* 整体模块：与截图一致的窄栏边框盒子 */
+        .yqh_box {
+            width: 319px;
+            margin: 0 auto;
+            border: 1px solid #d2d2d2;
+            background: #fff;
+        }
+
+        /* ===== 选项卡栏（未点击时整栏白底、全部深蓝字） ===== */
+        .yqh_tabbar {
+            display: flex;
+            align-items: stretch;
+            height: 27px;
+            background: #fff;
+            border-bottom: 1px solid #d2d2d2;
+        }
+        .yqh_tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-family: SimSun, "Songti SC", serif;
+            color: #1f3f87;
+            cursor: pointer;
+            border-right: 1px solid #e5e5e5;
+            border-top: 1px solid transparent;
+            user-select: none;
+        }
+        .yqh_tab:last-of-type { border-right: none; }
+
+        /* 选中态：白底 + 深蓝粗体字 + 顶部粗蓝条，盖住栏目底线 */
+        .yqh_tab.yqh_on {
+            background: #fff;
+            color: #1f3f87;
+            font-weight: 700;
+            border-top: 3px solid #1f3f87;
+            border-bottom: 1px solid #fff;
+            margin-bottom: -1px;
+            position: relative;
+        }
+
+        /* SUV 栏目：贴右侧留空隙，未选中时即为深蓝粗体字（无色块） */
+        .yqh_suv {
+            flex: 0 0 50px;
+            margin-left: 5px;
+            color: #1f3f87;
+            font-weight: 700;
+        }
+
+        /* ===== 内容面板 ===== */
+        .yqh_panel { display: none; }
+        .yqh_panel.yqh_on { display: block; }
+
+        .yqh_title {
+            color: #c00;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: SimSun, "Songti SC", serif;
+            padding: 11px 12px 7px;
+        }
+
+        .yqh_list {
+            list-style: none;
+            padding: 0 12px 10px;
+        }
+        .yqh_list li {
+            font-size: 13px;
+            line-height: 26px;
+            color: #000;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .yqh_list li::before {
+            content: "·";
+            color: #c00;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+        .yqh_list time {
+            float: right;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            color: #999;
+            line-height: 26px;
+            padding-left: 8px;
+        }
+
+        /* 返回首页链接（页面级，不影响模块还原效果） */
+        .yqh_home {
+            display: block;
+            width: 319px;
+            margin: 14px auto 0;
+            font-size: 12px;
+            font-family: SimSun, serif;
+            color: #06c;
+            text-decoration: none;
+        }
+        .yqh_home:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="yqh_box">
+        <div class="yqh_tabbar" id="yqh_tabbar">
+            <span class="yqh_tab">导购</span>
+            <span class="yqh_tab">3-9万</span>
+            <span class="yqh_tab">9-17万</span>
+            <span class="yqh_tab">17-42万</span>
+            <span class="yqh_tab yqh_suv">SUV</span>
+        </div>
+
+        <!-- 导购（对应截图1，点击后显示） -->
+        <div class="yqh_panel">
+            <h3 class="yqh_title">改变品牌的未来 认识豪华品牌最便宜车型</h3>
+            <ul class="yqh_list">
+                <li><time>12/19</time>推荐：X1等城市四驱Style+经济省油的SUV</li>
+                <li><time>12/19</time>全景天窗/保养便利 30万亦齐四驱SUV推荐</li>
+                <li><time>12/18</time>最高暴降20万！奥迪Q5等年底特惠SUV盘点</li>
+                <li><time>12/18</time>比拼硬实力 8款低配四驱紧凑SUV性能点评</li>
+                <li><time>12/17</time>花小钱也能养SUV 冀博等入门SUV使用手册</li>
+                <li><time>12/16</time>最高优惠4.3万 十款15万SUV年末购买推荐</li>
+            </ul>
+        </div>
+
+        <!-- 3-9万（对应截图4） -->
+        <div class="yqh_panel">
+            <h3 class="yqh_title">最低仅4.6万元起 超低价SUV购买价值点评</h3>
+            <ul class="yqh_list">
+                <li><time>12/19</time>全民摇号时代?六款低价占号必备车型推荐</li>
+                <li><time>12/11</time>朗动/观致3等 2013年全新热门家用车盘点</li>
+                <li><time>12/09</time>坚持低价高配路线！静态评测华泰路盛E70</li>
+                <li><time>11/29</time>买车先看销量 10月份销量前十名轿车盘点</li>
+                <li><time>11/28</time>抄底正当时 车展后清仓优惠老款车型推荐</li>
+                <li><time>11/27</time>土豪气质 细数车展那些低价车上的“神器”</li>
+            </ul>
+        </div>
+
+        <!-- 9-17万（对应截图3） -->
+        <div class="yqh_panel">
+            <h3 class="yqh_title">15万级降价车更值 预算/油耗/空间较量</h3>
+            <ul class="yqh_list">
+                <li><time>12/20</time>爸爸去哪？亲子出游适合车型和注意事项</li>
+                <li><time>12/18</time>最高暴降20万！奥迪Q5等年底特惠SUV盘点</li>
+                <li><time>12/18</time>配侧气帘值得肯定！传祺GA3碰撞试验图解</li>
+                <li><time>12/18</time>高尔夫7≠两厢版速腾 配置/动力差异解读</li>
+                <li><time>12/17</time>花小钱也能养SUV 冀博等入门SUV使用手册</li>
+                <li><time>12/16</time>最高优惠4.3万 十款15万SUV年末购买推荐</li>
+            </ul>
+        </div>
+
+        <!-- 17-42万（对应截图2） -->
+        <div class="yqh_panel">
+            <h3 class="yqh_title">改变品牌的未来 认识豪华品牌最便宜车型</h3>
+            <ul class="yqh_list">
+                <li><time>12/20</time>爸爸去哪？亲子出游适合车型和注意事项</li>
+                <li><time>12/19</time>推荐：X1等城市四驱Style+经济省油的SUV</li>
+                <li><time>12/19</time>全景天窗/保养便利 30万亦齐四驱SUV推荐</li>
+                <li><time>12/18</time>最高暴降20万！奥迪Q5等年底特惠SUV盘点</li>
+                <li><time>12/18</time>比拼硬实力 8款低配四驱紧凑SUV性能点评</li>
+                <li><time>12/17</time>新蒙迪欧/雅阁尊！盘点2013中级车大变脸</li>
+            </ul>
+        </div>
+
+        <!-- SUV（对应截图5） -->
+        <div class="yqh_panel">
+            <h3 class="yqh_title">B级品质满足A级需求 路盛E70亮点详解析</h3>
+            <ul class="yqh_list">
+                <li><time>12/20</time>购车必看 凯迪拉克XTS领先型28T深度体验</li>
+                <li><time>12/20</time>爸爸去哪？亲子出游适合车型和注意事项</li>
+                <li><time>12/19</time>推荐：X1等城市四驱Style+经济省油的SUV</li>
+                <li><time>12/19</time>全景天窗/保养便利 30万亦齐四驱SUV推荐</li>
+                <li><time>12/19</time>全民摇号时代?六款低价占号必备车型推荐</li>
+                <li><time>12/18</time>最高暴降20万！奥迪Q5等年底特惠SUV盘点</li>
+            </ul>
+        </div>
+    </div>
+
+    <a class="yqh_home" href="index.html">← 返回首页</a>
+
+    <script>
+        /**
+         * yqh_switchTab：切换到指定下标的选项卡——先清除所有选项卡与面板的选中状态，再设置当前元素的选中状态
+         * @param {number} yqh_index 要选中的选项卡下标（从 0 开始）
+         */
+        function yqh_switchTab(yqh_index) {
+            var yqh_tabs = document.querySelectorAll("#yqh_tabbar .yqh_tab");
+            var yqh_panels = document.querySelectorAll(".yqh_panel");
+
+            // 第一步：清除所有选项卡与面板的选中状态
+            yqh_tabs.forEach(function (yqh_tab) {
+                yqh_tab.classList.remove("yqh_on");
+            });
+            yqh_panels.forEach(function (yqh_panel) {
+                yqh_panel.classList.remove("yqh_on");
+            });
+
+            // 第二步：设置当前元素的选中状态
+            yqh_tabs[yqh_index].classList.add("yqh_on");
+            yqh_panels[yqh_index].classList.add("yqh_on");
+        }
+
+        /**
+         * yqh_initTabs：为每个选项卡绑定点击监听事件，点击时切换到对应面板
+         */
+        function yqh_initTabs() {
+            var yqh_tabs = document.querySelectorAll("#yqh_tabbar .yqh_tab");
+            yqh_tabs.forEach(function (yqh_tab, yqh_index) {
+                yqh_tab.addEventListener("click", function () {
+                    yqh_switchTab(yqh_index);
+                });
+            });
+        }
+
+        // 页面加载后初始化选项卡
+        yqh_initTabs();
+    </script>
+</body>
+</html>
