@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-10
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：第六件展品 · 魔都号国产大型邮轮 Swiper 展示页（滚轮 + 键盘方向键控制）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>魔都号 · 国产大型邮轮 · Swiper 展品页</title>
+<!-- Swiper 11 样式：分页、导航、切换效果的基础样式都靠它 -->
+<link rel="stylesheet" href="https://unpkg.com/swiper@11/swiper-bundle.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  /* 页面整体：深海蓝底，呼应邮轮与海面 */
+  body{
+    min-height:100vh;
+    font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    color:#e8eefb;
+    background:radial-gradient(1200px 620px at 50% -10%,#14406b 0%,#0a1c30 45%,#050d18 100%);
+    display:flex;flex-direction:column;align-items:center;
+    padding:28px 18px 40px;
+  }
+
+  /* 返回首页入口 */
+  .yqh_home{
+    align-self:flex-start;text-decoration:none;font-size:13.5px;color:#cfe3ff;
+    border:1px solid rgba(140,190,255,.35);border-radius:999px;padding:7px 18px;
+    background:rgba(255,255,255,.04);transition:background .2s,transform .2s;
+  }
+  .yqh_home:hover{background:rgba(120,180,255,.16);transform:translateY(-2px)}
+
+  /* 页面标题区 */
+  .yqh_head{text-align:center;margin:22px 0 18px}
+  .yqh_head span{
+    display:inline-block;font-size:12px;letter-spacing:3px;color:#f0c46a;
+    border:1px solid rgba(240,196,106,.45);border-radius:999px;padding:5px 15px;
+    background:rgba(240,196,106,.08);
+  }
+  .yqh_head h1{margin-top:14px;font-size:28px;letter-spacing:2px}
+  .yqh_head h1 b{color:#f0c46a}
+  .yqh_head p{margin-top:10px;font-size:13.5px;color:#93a8c6}
+
+  /* 轮播舞台：限宽居中，保证 16:9 占位图不撑破页面 */
+  .yqh_stage{width:100%;max-width:920px;margin:8px auto 0}
+
+  /* 每个 slide 的容器：上下留白，方便放说明文字 */
+  .yqh_stage .swiper-slide{display:flex;flex-direction:column;align-items:center}
+
+  /* 16:9 横版占位图：aspect-ratio 让宽高比恒为 16/9，换真图时直接替换内部内容即可 */
+  .yqh_ph{
+    position:relative;width:100%;aspect-ratio:16/9;
+    border:1.5px dashed rgba(140,190,255,.45);border-radius:16px;
+    background:linear-gradient(135deg,rgba(120,180,255,.10),rgba(240,196,106,.06));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    overflow:hidden;
+  }
+  /* 占位图编号：右下角大水印，标明这是第几张 */
+  .yqh_ph .yqh_no{
+    position:absolute;right:20px;bottom:10px;font-size:64px;font-weight:bold;
+    color:rgba(255,255,255,.07);letter-spacing:2px;
+  }
+  /* 占位图正中的比例标注 */
+  .yqh_ph .yqh_ratio{font-size:15px;letter-spacing:2px;color:#b9cdea}
+  .yqh_ph .yqh_desc{font-size:12.5px;color:#7f95b4}
+  /* 放真图时：去掉虚线边框与底色，图片铺满 16:9 框并裁切多余部分 */
+  .yqh_ph.yqh_ph_img{border:none;background:none}
+  .yqh_ph img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* 每张展品下方的文字说明 */
+  .yqh_cap{margin-top:16px;text-align:center}
+  .yqh_cap h2{font-size:19px;letter-spacing:1px}
+  .yqh_cap p{margin-top:6px;font-size:13.5px;color:#9fb5d4}
+  .yqh_cap p b{color:#f0c46a}
+
+  /* 底部操作提示 */
+  .yqh_tip{margin-top:22px;font-size:13px;color:#7f95b4;text-align:center;line-height:1.9}
+
+  /* 屏幕较窄时缩小标题，避免换行拥挤 */
+  @media (max-width:600px){
+    .yqh_head h1{font-size:21px}
+    .yqh_ph .yqh_no{font-size:42px}
+  }
+</style>
+</head>
+<body>
+
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+
+  <header class="yqh_head">
+    <span>EXHIBIT 06 · SWIPER</span>
+    <h1>第六件展品 · <b>魔都号</b> 国产大型邮轮</h1>
+    <p>滚轮上下滚动、键盘 ← → 方向键都能翻页；不操作时每 3 秒自动播放</p>
+  </header>
+
+  <main class="yqh_stage">
+    <!-- Swiper 容器：最外层必须同时有 swiper 类名和 id -->
+    <div class="swiper" id="yqhSw">
+      <!-- swiper-wrapper 是滑动轨道，里面只放 swiper-slide -->
+      <div class="swiper-wrapper">
+
+        <!-- 第 1 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_1.png" alt="魔都号船艏落日全景">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 船艏落日</h2>
+            <p>国产首艘大型邮轮 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+        <!-- 第 2 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_2.png" alt="魔都号海上航行整船侧面">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 海上航行</h2>
+            <p>13.55 万吨 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+        <!-- 第 3 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_3.png" alt="魔都号靠泊母港码头">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 靠泊母港</h2>
+            <p>从上海出发 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+        <!-- 第 4 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_4.png" alt="魔都号夜景灯光">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 夜航灯光</h2>
+            <p>驶向深蓝 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+        <!-- 第 5 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_5.png" alt="魔都号靠泊母港全景">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 母港全景</h2>
+            <p>上海吴淞口国际邮轮港 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+        <!-- 第 6 张：真实照片 -->
+        <div class="swiper-slide">
+          <div class="yqh_ph yqh_ph_img">
+            <img src="swiper-imgs/moduhao_6.png" alt="魔都号晨光中航行">
+          </div>
+          <div class="yqh_cap">
+            <h2>魔都号 · 晨光航行</h2>
+            <p>驶向东海 · <b>首航 2024 年 1 月</b></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <p class="yqh_tip">操作方式：鼠标滚轮 ↑↓ ／ 键盘 ← → ／ 按住拖动　　自动播放：每 3 秒一张</p>
+
+<!-- Swiper 11 脚本：必须放在初始化代码之前加载 -->
+<script src="https://unpkg.com/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  // yqh_newSwiper：创建魔都号展品轮播实例，开启滚轮、键盘与自动播放
+  var yqhSw = new Swiper('#yqhSw', {
+    // effect：切换效果，'slide' 是最默认的水平平推（另有 fade / cube / creative 等）
+    effect: 'slide',
+
+    // speed：一次切换动画的时长，单位毫秒，600 表示 0.6 秒滑到位
+    speed: 600,
+
+    // loop：无缝循环，第 6 张往后翻会接回第 1 张；配合 autoplay 才能一直播下去
+    loop: true,
+
+    // autoplay：自动播放，对象写法方便同时设置多个子参数
+    autoplay: {
+      // delay：每张停留时间，单位毫秒，3000 即 3 秒后翻下一张
+      delay: 3000,
+      // disableOnInteraction：用户手动滑动后是否停掉自动播放；
+      // false 表示不停，松手后继续按 3 秒一张往下播
+      disableOnInteraction: false,
+      // pauseOnMouseEnter：鼠标移入轮播区时暂停，移出继续（避免用户看图被切走）
+      pauseOnMouseEnter: true,
+    },
+
+    // mousewheel：鼠标滚轮控制切换，滚一下翻一张
+    mousewheel: {
+      // forceToAxis：只响应轮播的主轴方向（这里是水平），防止斜着滚时误触
+      forceToAxis: true,
+      // releaseOnEdges：翻到最后一张后释放滚轮事件，让页面本身能继续正常滚动
+      releaseOnEdges: true,
+      // thresholdDelta：滚轮累计多少像素才翻一张，数值越大越"钝"，这里设 10 比较跟手
+      thresholdDelta: 10,
+    },
+
+    // keyboard：键盘控制切换
+    keyboard: {
+      // enabled：开启键盘监听，默认方向键 ← → 翻页（上下键同样有效）
+      enabled: true,
+      // onlyInViewport：只有轮播在可视区域内时才响应键盘，避免滚动到页面别处还误翻页
+      onlyInViewport: true,
+    },
+
+    // slidesPerView：一屏显示几张 slide，1 表示整屏一张，改 2 就是并排两张
+    slidesPerView: 1,
+
+    // spaceBetween：slide 之间的间距，单位 px，这里单张展示所以为 0
+    spaceBetween: 0,
+
+    // grabCursor：鼠标悬停时变成小手，暗示"可以按住拖动"
+    grabCursor: true,
+  });
+</script>
+</body>
+</html>

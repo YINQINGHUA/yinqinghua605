@@ -469,3 +469,95 @@ SUV不点击是这样的，请修改（附 SUV 未选中态特写截图）
 将更改的代码提交到github
 
 **执行计划：** 按 yqh-github-submit 技能流程：核对课堂测试11-4.html（列表文字深蓝 #1f3f87、圆点黑 #000）与 yqh_prompt.md 两条记录，逐文件 add、中文提交信息 commit、git push github master，ls-remote 验证本地与远程一致。
+
+**执行说明：** 已提交 33f8bed（2 文件，+38/-2）并推送成功，远程 refs/heads/master 与本地 HEAD 均为 33f8bed。
+
+---
+
+## 2026-11-10 21:20:18 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+`d:/高级网页设计/swiper-task.html`任务4：帮我生成swiper配置，选择cube效果，开启自动轮播，添加圆点分页，配置id为wySw4
+
+**执行说明：** 修改 swiper-task.html 底部脚本中 #wySw4 的初始化配置：effect 由 slide 改为 cube 并补充 cubeEffect 参数，保留 loop、autoplay(delay 3200, disableOnInteraction:false)、pagination(#wyPag4, clickable)、speed 800；同时把页面按钮的 wy-on 高亮从 slide 移到 cube，使初始状态与配置一致。
+
+---
+
+## 2026-11-10 21:21:47 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+修正swiper #wySw4 配置：1. effect: 'cube' 2. loop: true 无缝循环 3. autoplay：delay 3200，disableOnInteraction: false （手动滑动之后自动播放继续，不会停）4. pagination: {el:分页圆点，clickable:true} 圆点可点击。输出完整js配置对象，不要多余代码
+
+**执行说明：** 按四项要求重写 #wySw4 配置对象：effect 'cube'、loop true、autoplay delay 3200 + disableOnInteraction false、pagination el "#wyPag4" clickable true，删除原 speed 800 与 cubeEffect 等多余参数。
+
+---
+
+## 2026-11-10 21:22:51 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+基于swiper 实现 effect:creative 电影墙切换效果，creativeEffect配置：prev（离开的上一张）：缩小scale，向左偏移X，旋转Y角度；next（即将进来的下一张）：放大scale，向右偏移X。参数你自己调好，做出电影墙纵深感觉；给页面新增一个按钮，点击切换到这个creative效果；写出完整html，引入swiper cdn，注释写清楚prev、next里面每一条transform参数含义。最后告诉我：transform里面百分比是相对谁的？
+
+**执行说明：** 新建 swiper-creative.html（Swiper 11 CDN），深色影院风格电影墙演示，#yqhSw 默认 slide，提供 slide/creative 两个按钮实时重建实例；creativeEffect 的 prev 缩小+左移+绕 Y 轴旋转+后推 Z，next 放大+右移+前移 Z，并逐条注释 translate/rotate/scale/origin 参数含义与单位；最后解释 transform 百分比相对元素自身尺寸。
+
+---
+
+## 2026-11-10 21:28:04 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+是在任务4进阶里新增一个按钮effect:creative电影墙，不是新建一个html
+
+**执行说明：** 删除上一轮误建的 swiper-creative.html；改为在 swiper-task.html 任务 4 的效果按钮组里新增 "creative 电影墙" 按钮，并在按钮重建实例的配置中补上 creativeEffect（prev 缩小/左移/绕 Y 轴转/Z 后退，next 放大/右移/Z 前压），CSS 为 .swiper-creative .swiper-wrapper 加 perspective 以呈现纵深；同步把"6 个按钮/六种效果"文案改为 7 个。浏览器实测切换正常。
+
+---
+
+## 2026-11-10 21:38:07 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+添加第六件展品Swiper页面，主题：魔都号国产大型邮轮，一共6个slide，图片用占位，标注16:9横版，文字说明：首航2024年1月；开启mousewheel滚轮控制切换；同时开启键盘方向键控制；effect用slide；autoplay delay默认3000；所有代码带注释，写清楚每一项参数作用；请保留可直接运行的完整html，引入swiper css和js cdn。
+
+**执行说明：** 新建 swiper-moduhao.html 作为第六件展品页（Swiper 11，unpkg CDN）：6 个 slide 用 16:9 横版 CSS 占位图，文案统一标注"首航 2024 年 1 月"；配置 effect:'slide'、loop、autoplay delay 3000（disableOnInteraction:false）、mousewheel、keyboard(enabled+onlyInViewport)，每项参数逐一注释；浏览器实测滚轮与方向键均可切换。
+
+---
+
+## 2026-11-10 21:45:07 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+将这四个图片放到swiper-imgs里，然后应用到swiper-moduhao.html里
+
+**执行说明：** 把上传的 4 张魔都号照片复制为 swiper-imgs/moduhao_1~4.png，替换 swiper-moduhao.html 前 4 个 slide 的占位框为 <img>（object-fit:cover 保持 16:9 裁切），文案按图片内容改为船艏落日、海上航行、靠泊母港、夜航灯光；第 5、6 张仍保留 16:9 横版占位图。
+
+---
+
+## 2026-11-10 21:50:18 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+还有两张图片
+
+**执行说明：** 把两张新图复制为 swiper-imgs/moduhao_5.png、moduhao_6.png，替换第 5、6 个 slide 的占位框为真实图片，文案改为母港全景、晨光航行；经哈希比对 moduhao_5 与 moduhao_3 是同一张照片（内容重复），已在回复中提示用户。
+
+---
+
+## 2026-11-10 21:51:23 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+跟新index
+
+**执行说明：** 在 index.html 课堂目录末尾新增两条入口卡片：10 / SWIPER 指向 swiper-task.html，11 / EXHIBIT 指向 swiper-moduhao.html；页面统计文案由"当前 9 个练习页面"改为 11 个。
+
+---
+
+## 2026-11-10 21:52:48 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+提交到github
+
+**执行说明：** 按 yqh-github-submit 技能：git status/diff 核对后，逐个添加 index.html、yqh_prompt.md、swiper-task.html、swiper-moduhao.html、swiper-imgs/，中文提交信息 commit，git push github master，ls-remote 验证；swiper/ 库目录（378 文件）与 .trae-html-share-packages/（24.6MB 工具产物）不提交。
