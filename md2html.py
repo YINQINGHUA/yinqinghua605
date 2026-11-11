@@ -13,8 +13,8 @@ import re
 
 SRC = pathlib.Path("yqh_prompt.md")
 DST = pathlib.Path("yqh_prompt.html")
-# 只保留该日期（含）之后的记录
-CUTOFF = "2026-11-10"
+# 留空表示不做日期过滤，完整输出 yqh_prompt.md 的全部记录
+CUTOFF = ""
 
 TEMPLATE = """<!DOCTYPE html>
 <!--
@@ -106,7 +106,9 @@ def convert(md_text):
 
 
 def keep_blocks(md_text):
-    """yqh_keepBlocks：按 '---' 切分记录块，只保留 CUTOFF 当天及之后的记录"""
+    """yqh_keepBlocks：按 '---' 切分记录块，CUTOFF 为空时原样返回，否则只保留该日期及之后的记录"""
+    if not CUTOFF:
+        return md_text
     kept = []
     for block in re.split(r"\n-{3,}\n", md_text):
         m = re.search(r"^## (\d{4}-\d{2}-\d{2})", block, re.M)
@@ -120,9 +122,12 @@ def keep_blocks(md_text):
 def main():
     md = SRC.read_text(encoding="utf-8")
     body, count = convert(keep_blocks(md))
-    header = f'<h1>AI 提示词记录</h1>\n<p>仅保留 {CUTOFF} 起的 {count} 条记录</p>\n'
+    # 过滤模式下 md 的标题块被丢掉，这里补一个；完整模式下 md 自带的标题已渲染，不再重复
+    header = ""
+    if CUTOFF:
+        header = f'<h1>AI 提示词记录</h1>\n<p>仅保留 {CUTOFF} 起的 {count} 条记录</p>\n'
     DST.write_text(TEMPLATE.format(body=header + body, count=count), encoding="utf-8")
-    print(f"已生成 {DST}，共 {count} 条记录（{CUTOFF} 起）")
+    print(f"已生成 {DST}，共 {count} 条记录" + (f"（{CUTOFF} 起）" if CUTOFF else "（完整）"))
 
 
 if __name__ == "__main__":

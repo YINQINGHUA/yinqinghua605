@@ -653,3 +653,13 @@ index的提示词打开看不到里面的信息，我需要看到里面内容
 index删除swiper-moduhao
 
 **执行说明：** 删除 index.html 中 11 / EXHIBIT「第六件展品 · 魔都号」卡片，目录统计改为 10 个练习页面；swiper-moduhao.html 文件本身保留，仍可从 swiper-task.html 的第六件展品区块访问。
+
+---
+
+## 2026-11-11 14:27:27 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+将yqh_prompt.md的内容完整展现
+
+**执行说明：** md2html.py 的 CUTOFF 置空，取消 2026-11-10 日期过滤，yqh_prompt.html 重新生成后完整收录 58 条记录（2026-10-23 起），标题与开头的规则说明一并保留。
