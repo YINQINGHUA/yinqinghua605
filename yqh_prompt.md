@@ -561,3 +561,95 @@ SUV不点击是这样的，请修改（附 SUV 未选中态特写截图）
 提交到github
 
 **执行说明：** 按 yqh-github-submit 技能：git status/diff 核对后，逐个添加 index.html、yqh_prompt.md、swiper-task.html、swiper-moduhao.html、swiper-imgs/，中文提交信息 commit，git push github master，ls-remote 验证；swiper/ 库目录（378 文件）与 .trae-html-share-packages/（24.6MB 工具产物）不提交。
+
+---
+
+## 2026-11-11 13:26:28 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+将yqh_prompt.md加入到index
+
+**执行说明：** 在 index.html 课堂目录末尾新增 12 / PROMPT LOG 卡片，链接到 ./yqh_prompt.md（"查看记录"），统计文案改为"当前 12 个练习页面"。
+
+---
+
+## 2026-11-11 13:39:54 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+全部弄一下
+
+（追问后用户答复：将刚刚删除的补回来）
+
+**执行说明：** 发现 index.html、swiper-task.html、yqh_prompt.md 三个文件被回退到 bacd8c1 之前的内容，swiper-moduhao.html 被整文件删除；用 git restore 全部还原到提交 bacd8c1，再重新补上 PROMPT LOG 卡片（统计改为 12 个）与这两条提示词记录。
+
+---
+
+## 2026-11-11 13:42:14 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+将swiper-moduhao这个文件插入到swiper-task里
+
+**执行说明：** 在 swiper-task.html 任务 4 之后新增"第六件展品：魔都号"区块（编号 5，成品参考，非任务）：6 张 16:9 横版照片 + 圆点分页器 #wyPag5；新增 .wy-169 让 slide 按 16:9 比例而非 290px 固定高度；JS 初始化 #wySw5，配置 effect slide、loop、autoplay 3000（disableOnInteraction false、pauseOnMouseEnter）、pagination、mousewheel、keyboard，逐项注释。
+
+---
+
+## 2026-11-11 13:50:36 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+为什么鼠标放到第六件展品，用不了滚轮
+
+**执行说明：** 查 Swiper 11 源码（swiper-bundle.js 第 4956-4959 行）确认 mousewheel.forceToAxis 为 true 时，水平轮播只接受 |pixelX|>|pixelY| 的滚轮事件，普通鼠标纵向 deltaY 直接被忽略；将 swiper-task.html 的 #wySw5 与 swiper-moduhao.html 的 forceToAxis 改为 false 并补注释，浏览器实测纵向滚轮 realIndex 0→1 生效。
+
+---
+
+## 2026-11-11 13:50:54 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+给swiper-task文件加入ai提示词的入口，提示词在yqh——prompt.md里，
+
+**执行说明：** 在 swiper-task.html 底部 .wy-back 按钮行追加"查看 AI 提示词记录 →"，链接到 yqh_prompt.md。
+
+---
+
+## 2026-11-11 13:54:36 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+index的提示词打开看不到里面的信息，我需要看到里面内容
+
+**执行说明：** 浏览器打开 .md 会直接下载或显示源码，因此新增 md2html.py（把 yqh_prompt.md 转成带样式的 yqh_prompt.html），生成 54 条记录的阅读页；index.html 与 swiper-task.html 的提示词入口改为指向 yqh_prompt.html。
+
+---
+
+## 2026-11-11 13:57:26 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+只保留2026-11-10号以后的，将index里面的删除，插入到swiper-task里
+
+**执行说明：** yqh_prompt.md 保持只追加不改动；给 md2html.py 加 CUTOFF="2026-11-10" 过滤（按 --- 切块、读 ## 日期标题），重新生成 yqh_prompt.html 仅含 15 条记录；删除 index.html 的 12 / PROMPT LOG 卡片（统计改回 11 个）；在 swiper-task.html 新增第 6 区块"AI 提示词记录"，以时间轴列出这 15 条提示词并链到 yqh_prompt.html。
+
+---
+
+## 2026-11-11 14:00:14 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+这里不需要（附 swiper-task.html 中 AI 提示词时间轴的截图）
+
+**执行说明：** 删除 swiper-task.html 第 6 区块"AI 提示词记录"时间轴及其 .wy-log 样式，底部恢复"查看 AI 提示词记录 →"单一入口，指向 yqh_prompt.html。
+
+---
+
+## 2026-11-11 14:02:23 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+index删除swiper-moduhao
+
+**执行说明：** 删除 index.html 中 11 / EXHIBIT「第六件展品 · 魔都号」卡片，目录统计改为 10 个练习页面；swiper-moduhao.html 文件本身保留，仍可从 swiper-task.html 的第六件展品区块访问。

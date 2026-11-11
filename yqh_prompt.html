@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-11
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：提示词记录阅读页（由 md2html.py 从 yqh_prompt.md 自动生成，请勿手改）
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词记录 · 高级网页设计</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    background:#f7f5ef;color:#2b2b2b;line-height:1.9;
+    padding:32px 18px 60px;
+  }
+  .yqh_home{
+    display:inline-block;margin-bottom:22px;text-decoration:none;font-size:13.5px;
+    color:#7a5b2a;border:1px solid #d8c9a8;border-radius:999px;padding:7px 18px;background:#fff;
+  }
+  .yqh_home:hover{background:#f1e7d2}
+  .yqh_doc{max-width:900px;margin:0 auto;background:#fff;border:1px solid #e6e0d2;border-radius:14px;padding:34px 38px;box-shadow:0 6px 20px rgba(90,70,30,.07)}
+  .yqh_doc h1{font-size:25px;color:#3a2c14;margin-bottom:18px;letter-spacing:1px}
+  .yqh_doc h2{font-size:17px;color:#8a5a12;margin:26px 0 8px;padding-top:16px;border-top:1px dashed #e8dfc8;letter-spacing:.5px}
+  .yqh_doc h2:first-of-type{border-top:none;padding-top:0}
+  .yqh_doc h3{font-size:15px;color:#4a3a1c;margin:16px 0 6px}
+  .yqh_doc p{font-size:14.5px;margin:6px 0;color:#3b3b3b}
+  .yqh_doc hr{border:none;border-top:1px solid #f0ead9;margin:18px 0}
+  .yqh_doc strong{color:#8a3d0c}
+  .yqh_doc code{background:#f6efe0;color:#8a4b00;padding:1px 6px;border-radius:5px;font-family:Consolas,monospace;font-size:13px}
+  .yqh_count{text-align:center;font-size:12.5px;color:#a09780;margin-top:18px}
+</style>
+</head>
+<body>
+<a class="yqh_home" href="index.html">← 返回首页</a>
+<div class="yqh_doc">
+<h1>AI 提示词记录</h1>
+<p>仅保留 2026-11-10 起的 18 条记录</p>
+<h2>2026-11-10 21:20:18 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p><code>d:/高级网页设计/swiper-task.html</code>任务4：帮我生成swiper配置，选择cube效果，开启自动轮播，添加圆点分页，配置id为wySw4</p>
+<p><strong>执行说明：</strong> 修改 swiper-task.html 底部脚本中 #wySw4 的初始化配置：effect 由 slide 改为 cube 并补充 cubeEffect 参数，保留 loop、autoplay(delay 3200, disableOnInteraction:false)、pagination(#wyPag4, clickable)、speed 800；同时把页面按钮的 wy-on 高亮从 slide 移到 cube，使初始状态与配置一致。</p>
+<hr>
+<h2>2026-11-10 21:21:47 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>修正swiper #wySw4 配置：1. effect: &#x27;cube&#x27; 2. loop: true 无缝循环 3. autoplay：delay 3200，disableOnInteraction: false （手动滑动之后自动播放继续，不会停）4. pagination: {el:分页圆点，clickable:true} 圆点可点击。输出完整js配置对象，不要多余代码</p>
+<p><strong>执行说明：</strong> 按四项要求重写 #wySw4 配置对象：effect &#x27;cube&#x27;、loop true、autoplay delay 3200 + disableOnInteraction false、pagination el &quot;#wyPag4&quot; clickable true，删除原 speed 800 与 cubeEffect 等多余参数。</p>
+<hr>
+<h2>2026-11-10 21:22:51 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>基于swiper 实现 effect:creative 电影墙切换效果，creativeEffect配置：prev（离开的上一张）：缩小scale，向左偏移X，旋转Y角度；next（即将进来的下一张）：放大scale，向右偏移X。参数你自己调好，做出电影墙纵深感觉；给页面新增一个按钮，点击切换到这个creative效果；写出完整html，引入swiper cdn，注释写清楚prev、next里面每一条transform参数含义。最后告诉我：transform里面百分比是相对谁的？</p>
+<p><strong>执行说明：</strong> 新建 swiper-creative.html（Swiper 11 CDN），深色影院风格电影墙演示，#yqhSw 默认 slide，提供 slide/creative 两个按钮实时重建实例；creativeEffect 的 prev 缩小+左移+绕 Y 轴旋转+后推 Z，next 放大+右移+前移 Z，并逐条注释 translate/rotate/scale/origin 参数含义与单位；最后解释 transform 百分比相对元素自身尺寸。</p>
+<hr>
+<h2>2026-11-10 21:28:04 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>是在任务4进阶里新增一个按钮effect:creative电影墙，不是新建一个html</p>
+<p><strong>执行说明：</strong> 删除上一轮误建的 swiper-creative.html；改为在 swiper-task.html 任务 4 的效果按钮组里新增 &quot;creative 电影墙&quot; 按钮，并在按钮重建实例的配置中补上 creativeEffect（prev 缩小/左移/绕 Y 轴转/Z 后退，next 放大/右移/Z 前压），CSS 为 .swiper-creative .swiper-wrapper 加 perspective 以呈现纵深；同步把&quot;6 个按钮/六种效果&quot;文案改为 7 个。浏览器实测切换正常。</p>
+<hr>
+<h2>2026-11-10 21:38:07 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>添加第六件展品Swiper页面，主题：魔都号国产大型邮轮，一共6个slide，图片用占位，标注16:9横版，文字说明：首航2024年1月；开启mousewheel滚轮控制切换；同时开启键盘方向键控制；effect用slide；autoplay delay默认3000；所有代码带注释，写清楚每一项参数作用；请保留可直接运行的完整html，引入swiper css和js cdn。</p>
+<p><strong>执行说明：</strong> 新建 swiper-moduhao.html 作为第六件展品页（Swiper 11，unpkg CDN）：6 个 slide 用 16:9 横版 CSS 占位图，文案统一标注&quot;首航 2024 年 1 月&quot;；配置 effect:&#x27;slide&#x27;、loop、autoplay delay 3000（disableOnInteraction:false）、mousewheel、keyboard(enabled+onlyInViewport)，每项参数逐一注释；浏览器实测滚轮与方向键均可切换。</p>
+<hr>
+<h2>2026-11-10 21:45:07 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>将这四个图片放到swiper-imgs里，然后应用到swiper-moduhao.html里</p>
+<p><strong>执行说明：</strong> 把上传的 4 张魔都号照片复制为 swiper-imgs/moduhao_1~4.png，替换 swiper-moduhao.html 前 4 个 slide 的占位框为 &lt;img&gt;（object-fit:cover 保持 16:9 裁切），文案按图片内容改为船艏落日、海上航行、靠泊母港、夜航灯光；第 5、6 张仍保留 16:9 横版占位图。</p>
+<hr>
+<h2>2026-11-10 21:50:18 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>还有两张图片</p>
+<p><strong>执行说明：</strong> 把两张新图复制为 swiper-imgs/moduhao_5.png、moduhao_6.png，替换第 5、6 个 slide 的占位框为真实图片，文案改为母港全景、晨光航行；经哈希比对 moduhao_5 与 moduhao_3 是同一张照片（内容重复），已在回复中提示用户。</p>
+<hr>
+<h2>2026-11-10 21:51:23 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>跟新index</p>
+<p><strong>执行说明：</strong> 在 index.html 课堂目录末尾新增两条入口卡片：10 / SWIPER 指向 swiper-task.html，11 / EXHIBIT 指向 swiper-moduhao.html；页面统计文案由&quot;当前 9 个练习页面&quot;改为 11 个。</p>
+<hr>
+<h2>2026-11-10 21:52:48 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>提交到github</p>
+<p><strong>执行说明：</strong> 按 yqh-github-submit 技能：git status/diff 核对后，逐个添加 index.html、yqh_prompt.md、swiper-task.html、swiper-moduhao.html、swiper-imgs/，中文提交信息 commit，git push github master，ls-remote 验证；swiper/ 库目录（378 文件）与 .trae-html-share-packages/（24.6MB 工具产物）不提交。</p>
+<hr>
+<h2>2026-11-11 13:26:28 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>将yqh_prompt.md加入到index</p>
+<p><strong>执行说明：</strong> 在 index.html 课堂目录末尾新增 12 / PROMPT LOG 卡片，链接到 ./yqh_prompt.md（&quot;查看记录&quot;），统计文案改为&quot;当前 12 个练习页面&quot;。</p>
+<hr>
+<h2>2026-11-11 13:39:54 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>全部弄一下</p>
+<p>（追问后用户答复：将刚刚删除的补回来）</p>
+<p><strong>执行说明：</strong> 发现 index.html、swiper-task.html、yqh_prompt.md 三个文件被回退到 bacd8c1 之前的内容，swiper-moduhao.html 被整文件删除；用 git restore 全部还原到提交 bacd8c1，再重新补上 PROMPT LOG 卡片（统计改为 12 个）与这两条提示词记录。</p>
+<hr>
+<h2>2026-11-11 13:42:14 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>将swiper-moduhao这个文件插入到swiper-task里</p>
+<p><strong>执行说明：</strong> 在 swiper-task.html 任务 4 之后新增&quot;第六件展品：魔都号&quot;区块（编号 5，成品参考，非任务）：6 张 16:9 横版照片 + 圆点分页器 #wyPag5；新增 .wy-169 让 slide 按 16:9 比例而非 290px 固定高度；JS 初始化 #wySw5，配置 effect slide、loop、autoplay 3000（disableOnInteraction false、pauseOnMouseEnter）、pagination、mousewheel、keyboard，逐项注释。</p>
+<hr>
+<h2>2026-11-11 13:50:36 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>为什么鼠标放到第六件展品，用不了滚轮</p>
+<p><strong>执行说明：</strong> 查 Swiper 11 源码（swiper-bundle.js 第 4956-4959 行）确认 mousewheel.forceToAxis 为 true 时，水平轮播只接受 |pixelX|&gt;|pixelY| 的滚轮事件，普通鼠标纵向 deltaY 直接被忽略；将 swiper-task.html 的 #wySw5 与 swiper-moduhao.html 的 forceToAxis 改为 false 并补注释，浏览器实测纵向滚轮 realIndex 0→1 生效。</p>
+<hr>
+<h2>2026-11-11 13:50:54 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>给swiper-task文件加入ai提示词的入口，提示词在yqh——prompt.md里，</p>
+<p><strong>执行说明：</strong> 在 swiper-task.html 底部 .wy-back 按钮行追加&quot;查看 AI 提示词记录 →&quot;，链接到 yqh_prompt.md。</p>
+<hr>
+<h2>2026-11-11 13:54:36 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>index的提示词打开看不到里面的信息，我需要看到里面内容</p>
+<p><strong>执行说明：</strong> 浏览器打开 .md 会直接下载或显示源码，因此新增 md2html.py（把 yqh_prompt.md 转成带样式的 yqh_prompt.html），生成 54 条记录的阅读页；index.html 与 swiper-task.html 的提示词入口改为指向 yqh_prompt.html。</p>
+<hr>
+<h2>2026-11-11 13:57:26 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>只保留2026-11-10号以后的，将index里面的删除，插入到swiper-task里</p>
+<p><strong>执行说明：</strong> yqh_prompt.md 保持只追加不改动；给 md2html.py 加 CUTOFF=&quot;2026-11-10&quot; 过滤（按 --- 切块、读 ## 日期标题），重新生成 yqh_prompt.html 仅含 15 条记录；删除 index.html 的 12 / PROMPT LOG 卡片（统计改回 11 个）；在 swiper-task.html 新增第 6 区块&quot;AI 提示词记录&quot;，以时间轴列出这 15 条提示词并链到 yqh_prompt.html。</p>
+<hr>
+<h2>2026-11-11 14:00:14 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>这里不需要（附 swiper-task.html 中 AI 提示词时间轴的截图）</p>
+<p><strong>执行说明：</strong> 删除 swiper-task.html 第 6 区块&quot;AI 提示词记录&quot;时间轴及其 .wy-log 样式，底部恢复&quot;查看 AI 提示词记录 →&quot;单一入口，指向 yqh_prompt.html。</p>
+<hr>
+<h2>2026-11-11 14:02:23 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>index删除swiper-moduhao</p>
+<p><strong>执行说明：</strong> 删除 index.html 中 11 / EXHIBIT「第六件展品 · 魔都号」卡片，目录统计改为 10 个练习页面；swiper-moduhao.html 文件本身保留，仍可从 swiper-task.html 的第六件展品区块访问。</p>
+</div>
+<p class="yqh_count">18 条记录 · 由 yqh_prompt.md 自动生成</p>
+</body>
+</html>

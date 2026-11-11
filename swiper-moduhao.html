@@ -201,8 +201,9 @@
 
     // mousewheel：鼠标滚轮控制切换，滚一下翻一张
     mousewheel: {
-      // forceToAxis：只响应轮播的主轴方向（这里是水平），防止斜着滚时误触
-      forceToAxis: true,
+      // forceToAxis 必须为 false：true 时只接受横向滚轮事件（deltaX），
+      // 普通鼠标滚轮只有纵向 deltaY，会被忽略，表现就是"滚轮没反应"
+      forceToAxis: false,
       // releaseOnEdges：翻到最后一张后释放滚轮事件，让页面本身能继续正常滚动
       releaseOnEdges: true,
       // thresholdDelta：滚轮累计多少像素才翻一张，数值越大越"钝"，这里设 10 比较跟手

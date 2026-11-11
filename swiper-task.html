@@ -50,6 +50,8 @@
   .wy-swiper{width:100%;max-width:760px;margin:0 auto;border-radius:16px;overflow:visible!important}
   .wy-swiper .swiper{border-radius:16px;box-shadow:0 10px 26px rgba(15,43,91,.18)}
   .wy-swiper .swiper-slide{position:relative;height:290px}
+  /* 第六件展品的照片是 16:9 横版，改用比例高度，避免被 290px 固定高度裁掉船首船尾 */
+  .wy-swiper.wy-169 .swiper-slide{height:auto;aspect-ratio:16/9}
   .wy-swiper .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block}
   /* creative 电影墙需要透视，translate 的 Z 轴与 rotate 的 Y 轴才有纵深感（只作用于 creative 效果，不影响 cube） */
   .wy-swiper .swiper-creative .swiper-wrapper{perspective:1400px}
@@ -77,6 +79,7 @@
   }
   .wy-fx button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(29,91,191,.18)}
   .wy-fx button.wy-on{background:linear-gradient(135deg,#0f2b5b,#1d5bbf);color:#fff;border-color:transparent}
+
 
   .wy-back{text-align:center;margin-top:28px}
   .wy-back a{display:inline-block;text-decoration:none;color:#0f2b5b;font-size:14.5px;font-weight:bold;background:#fff;border:1px solid #dbe4ff;border-radius:999px;padding:10px 26px;transition:transform .2s,box-shadow .2s}
@@ -231,7 +234,32 @@
     </div>
   </div>
 
-  <div class="wy-back"><a href="index.html">← 返回课堂实践中心</a>　<a href="swiper-lesson.html">查看教师讲解版 →</a></div>
+  <!-- 第六件展品 · 魔都号 -->
+  <div class="wy-sec">
+    <div class="wy-sec-head">
+      <span class="wy-no">5</span>
+      <h2>第六件展品：魔都号<small>成品参考 · 滚轮 / 键盘方向键 / 3 秒自动播放</small></h2>
+    </div>
+    <p class="wy-txt">这一台不是任务，是<b>做好的成品</b>：国产首艘大型邮轮"爱达·魔都号"，6 张 16:9 横版照片，<b>2024 年 1 月</b>首航。它同时开了三种控制方式——<b>鼠标滚轮</b>翻页、<b>键盘 ← →</b>翻页、<b>按住拖动</b>，不动它时每 3 秒自动播下一张。</p>
+    <div class="wy-demo">
+      <span class="wy-demo-tag">🎛️ 演示五 · 魔都号国产大型邮轮（把鼠标移上去滚滚轮，或按方向键）</span>
+      <div class="wy-swiper wy-169">
+        <div class="swiper" id="wySw5">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_1.png" alt="魔都号船艏落日全景"><div class="wy-cap"><h3>魔都号 · 船艏落日</h3><p>国产首艘大型邮轮 · 首航 2024 年 1 月</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_2.png" alt="魔都号海上航行整船侧面"><div class="wy-cap"><h3>魔都号 · 海上航行</h3><p>13.55 万吨 · 首航 2024 年 1 月</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_3.png" alt="魔都号靠泊母港码头"><div class="wy-cap"><h3>魔都号 · 靠泊母港</h3><p>从上海出发 · 首航 2024 年 1 月</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_4.png" alt="魔都号夜航灯光"><div class="wy-cap"><h3>魔都号 · 夜航灯光</h3><p>驶向深蓝 · 首航 2024 年 1 月</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_5.png" alt="魔都号靠泊母港全景"><div class="wy-cap"><h3>魔都号 · 母港全景</h3><p>上海吴淞口国际邮轮港 · 首航 2024 年 1 月</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/moduhao_6.png" alt="魔都号晨光中航行"><div class="wy-cap"><h3>魔都号 · 晨光航行</h3><p>驶向东海 · 首航 2024 年 1 月</p></div></div>
+          </div>
+          <div class="swiper-pagination" id="wyPag5"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wy-back"><a href="index.html">← 返回课堂实践中心</a>　<a href="swiper-lesson.html">查看教师讲解版 →</a>　<a href="yqh_prompt.html">查看 AI 提示词记录 →</a></div>
 
   <footer>Swiper 课堂操作任务 · 大国重器光影展（学生版） · 高级网页设计 · 2026-2027-1</footer>
 </div>
@@ -332,6 +360,40 @@
       });
     });
   })
+
+  // ── 第六件展品：魔都号轮播，滚轮 + 键盘方向键 + 每 3 秒自动播放 ──
+  var wySw5 = new Swiper("#wySw5", {
+    // effect：slide 水平平推，邮轮照片最适合这种不花哨的切换
+    effect: 'slide',
+    // loop：6 张首尾相接，自动播放才能一直循环下去
+    loop: true,
+    // autoplay：自动播放
+    autoplay: {
+      delay: 3000,                  // 每张停留 3 秒
+      disableOnInteraction: false,  // 手动滑动/滚轮之后不停播
+      pauseOnMouseEnter: true,      // 鼠标停在图上时暂停，避免看着看着被切走
+    },
+    // pagination：底部圆点，clickable 允许点击跳转
+    pagination: {
+      el: "#wyPag5",
+      clickable: true,
+    },
+    // mousewheel：鼠标滚轮翻页（只在鼠标位于这个轮播上时生效）
+    mousewheel: {
+      // forceToAxis 必须为 false：为 true 时只认"横向滚动"的滚轮事件（deltaX），
+      // 普通鼠标滚轮只有纵向 deltaY，会被直接忽略，表现就是"滚轮没反应"
+      forceToAxis: false,
+      releaseOnEdges: true,   // 翻到首尾后释放滚轮，让整页还能正常滚动
+      thresholdDelta: 10,     // 累计滚动 10px 才翻一张，手感更稳
+    },
+    // keyboard：键盘方向键翻页
+    keyboard: {
+      enabled: true,          // ← → ↑ ↓ 均可切换
+      onlyInViewport: true,   // 只有轮播在可视区内才响应，避免页面别处按键也翻页
+    },
+    // grabCursor：悬停显示小手，提示可以拖动
+    grabCursor: true,
+  });
 </script>
 </body>
 </html>
