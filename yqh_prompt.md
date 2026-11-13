@@ -663,3 +663,13 @@ index删除swiper-moduhao
 将yqh_prompt.md的内容完整展现
 
 **执行说明：** md2html.py 的 CUTOFF 置空，取消 2026-11-10 日期过滤，yqh_prompt.html 重新生成后完整收录 58 条记录（2026-10-23 起），标题与开头的规则说明一并保留。
+
+---
+
+## 2026-11-13 13:26:14 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+swiper-task里面的ai提示词也是全部内容
+
+**执行说明：** 经确认采用入口链接方式：swiper-task.html 底部仅保留「查看 AI 提示词记录 →」，指向 yqh_prompt.html；该页已完整收录 59 条记录（不再按日期过滤），本次无需改代码。
