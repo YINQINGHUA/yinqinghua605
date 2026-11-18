@@ -1,0 +1,187 @@
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-13
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：从本地 db 服务器读取 poems 数据，以上图下文卡片形式展示诗词
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诗词卡片 · 上图下文</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --yqh-paper:#f7f3e9;      /* 宣纸底色 */
+    --yqh-ink:#2b2620;        /* 墨色正文 */
+    --yqh-ink-soft:#6b6156;   /* 次级文字 */
+    --yqh-line:#d9cfba;       /* 细线框 */
+    --yqh-seal:#9c3d2e;       /* 印章朱红，唯一强调色 */
+  }
+  body{
+    font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",serif;
+    background:
+      radial-gradient(circle at 20% 0%,#fffdf7,transparent 60%),
+      radial-gradient(circle at 85% 100%,#f1e9d8,transparent 55%),
+      var(--yqh-paper);
+    color:var(--yqh-ink);
+    min-height:100vh;
+    padding:56px 20px 72px;
+  }
+
+  /* 页头 */
+  .yqh_head{max-width:1080px;margin:0 auto 40px;text-align:center;position:relative}
+  .yqh_head h1{font-size:34px;letter-spacing:.22em;font-weight:600}
+  .yqh_head h1 span{color:var(--yqh-seal)}
+  .yqh_head p{margin-top:14px;font-size:14px;letter-spacing:.12em;color:var(--yqh-ink-soft)}
+  .yqh_head::after{
+    content:"";display:block;width:64px;height:1px;background:var(--yqh-line);
+    margin:26px auto 0;
+  }
+
+  /* 卡片网格：一行两张，窄屏自动单列 */
+  .yqh_grid{
+    max-width:1080px;margin:0 auto;
+    display:grid;gap:30px;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  }
+
+  /* 单张卡片：上图下文 */
+  .yqh_card{
+    background:#fffdf8;
+    border:1px solid var(--yqh-line);
+    box-shadow:0 14px 30px -22px rgba(43,38,32,.55);
+    display:flex;flex-direction:column;
+    opacity:0;transform:translateY(16px);
+    animation:yqh_fade .7s ease forwards;
+  }
+  /* 图区：固定 4:3，图片裁切铺满 */
+  .yqh_pic{position:relative;aspect-ratio:4/3;overflow:hidden;background:#e9e2d3}
+  .yqh_pic img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+  .yqh_card:hover .yqh_pic img{transform:scale(1.04)}
+  /* 图片加载失败时的降级底纹 */
+  .yqh_pic.yqh_broken{display:flex;align-items:center;justify-content:center}
+  .yqh_pic.yqh_broken::after{content:"图片未加载";font-size:13px;letter-spacing:.2em;color:var(--yqh-ink-soft)}
+
+  /* 文区 */
+  .yqh_text{padding:26px 28px 30px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .yqh_title{font-size:20px;letter-spacing:.16em;font-weight:600;position:relative;padding-left:14px}
+  .yqh_title::before{
+    content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:4px;height:18px;background:var(--yqh-seal);
+  }
+  .yqh_content{font-size:15px;line-height:2.1;color:var(--yqh-ink-soft);letter-spacing:.06em;text-align:justify}
+
+  /* 状态提示 */
+  .yqh_state{max-width:1080px;margin:0 auto;text-align:center;font-size:14px;letter-spacing:.1em;color:var(--yqh-ink-soft);line-height:2}
+  .yqh_state b{color:var(--yqh-seal)}
+
+  /* 返回首页 */
+  .yqh_home{
+    display:block;width:max-content;margin:48px auto 0;
+    font-size:14px;letter-spacing:.1em;text-decoration:none;
+    color:var(--yqh-ink-soft);border-bottom:1px solid var(--yqh-line);padding-bottom:4px;
+  }
+  .yqh_home:hover{color:var(--yqh-seal);border-color:var(--yqh-seal)}
+
+  @keyframes yqh_fade{to{opacity:1;transform:none}}
+
+  /* 尊重减少动效偏好 */
+  @media (prefers-reduced-motion:reduce){
+    .yqh_card{opacity:1;transform:none;animation:none}
+    .yqh_pic img{transition:none}
+  }
+</style>
+</head>
+<body>
+
+  <header class="yqh_head">
+    <h1>诗词 <span>卡片</span></h1>
+    <p>数据来自本地服务器接口 /api/poems</p>
+  </header>
+
+  <main class="yqh_grid" id="yqhGrid">
+    <p class="yqh_state" id="yqhState">正在读取数据…</p>
+  </main>
+
+  <a class="yqh_home" href="index.html">← 返回首页</a>
+
+<script>
+  // yqh_render：根据 poems 数组生成上图下文卡片
+  function yqh_render(poems) {
+    var yqhGrid = document.getElementById('yqhGrid');
+    // 先清掉“正在读取”的提示
+    yqhGrid.innerHTML = '';
+
+    poems.forEach(function (yqhItem, yqhIndex) {
+      var yqhCard = document.createElement('article');
+      yqhCard.className = 'yqh_card';
+      // 依次入场，避免同时出现显得生硬
+      yqhCard.style.animationDelay = (yqhIndex * 0.09) + 's';
+
+      var yqhPicBox = document.createElement('div');
+      yqhPicBox.className = 'yqh_pic';
+      var yqhImg = document.createElement('img');
+      yqhImg.src = yqhItem.pic;
+      yqhImg.alt = yqhItem.title;
+      // 码云 raw 图片有防盗链，去掉 Referer 才能显示
+      yqhImg.referrerPolicy = 'no-referrer';
+      // yqh_onerror：图片地址失效时给图区加降级样式，不显示破图图标
+      yqhImg.addEventListener('error', function () {
+        yqhPicBox.classList.add('yqh_broken');
+        yqhImg.remove();
+      });
+      yqhPicBox.appendChild(yqhImg);
+
+      var yqhTextBox = document.createElement('div');
+      yqhTextBox.className = 'yqh_text';
+      var yqhTitle = document.createElement('h2');
+      yqhTitle.className = 'yqh_title';
+      yqhTitle.textContent = yqhItem.title;
+      var yqhContent = document.createElement('p');
+      yqhContent.className = 'yqh_content';
+      yqhContent.textContent = yqhItem.content;
+      yqhTextBox.appendChild(yqhTitle);
+      yqhTextBox.appendChild(yqhContent);
+
+      yqhCard.appendChild(yqhPicBox);
+      yqhCard.appendChild(yqhTextBox);
+      yqhGrid.appendChild(yqhCard);
+    });
+  }
+
+  // yqh_showState：在网格区域显示一条提示信息
+  function yqh_showState(msg, isError) {
+    var yqhGrid = document.getElementById('yqhGrid');
+    yqhGrid.innerHTML = '<p class="yqh_state">' + msg + '</p>';
+    if (isError) yqhGrid.firstChild.style.color = 'var(--yqh-seal)';
+  }
+
+  // yqh_load：请求 /api/poems 并渲染页面
+  function yqh_load() {
+    fetch('/api/poems')
+      .then(function (yqhRes) {
+        if (!yqhRes.ok) throw new Error('HTTP ' + yqhRes.status);
+        return yqhRes.json();
+      })
+      .then(function (yqhPoems) {
+        if (!yqhPoems.length) {
+          yqh_showState('db.json 里的 poems 是空的', true);
+          return;
+        }
+        yqh_render(yqhPoems);
+      })
+      .catch(function () {
+        yqh_showState(
+          '读取失败：请先在 db 目录执行 <b>node server.js</b>，' +
+          '再访问 <b>http://localhost:3004/yqh-poems.html</b>（直接双击打开 html 拿不到数据）',
+          true
+        );
+      });
+  }
+
+  yqh_load();
+</script>
+</body>
+</html>

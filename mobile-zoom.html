@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：移动端图片查看器（双指缩放 1~4 倍 + 单指拖动 + 双击 1x/2x 切换）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>移动端手势：图片缩放查看器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #14131a;
+            color: #f4f1ea;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+        }
+
+        .yqh_topbar {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .yqh_topbar h1 {
+            font-size: 17px;
+            letter-spacing: 1px;
+        }
+
+        .yqh_home {
+            font-size: 13px;
+            color: #ffb56b;
+            text-decoration: none;
+            border: 1px solid rgba(255, 181, 107, 0.5);
+            border-radius: 999px;
+            padding: 5px 12px;
+        }
+
+        .yqh_home:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 2px;
+        }
+
+        /* 页面打开时的提示条：双指缩放请用手机打开 */
+        .yqh_notice {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 181, 107, 0.12);
+            border: 1px solid rgba(255, 181, 107, 0.45);
+            border-radius: 12px;
+            color: #ffb56b;
+            font-size: 13px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* 查看器容器：overflow hidden 裁掉放大溢出的部分；
+           touch-action:none 让浏览器不接管手势，全部交给我们自己处理；
+           user-select:none 防止长按图片时弹出选中/系统菜单 */
+        .yqh_stage {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            height: 60vh;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            border-radius: 18px;
+            background: #000;
+            border: 1px solid rgba(244, 241, 234, 0.12);
+        }
+
+        .yqh_photo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            /* 缩放/拖动一律用 transform，双击切换时加 0.25s 过渡 */
+            transform-origin: center center;
+            will-change: transform;
+            /* 禁掉图片拖拽幻影和系统长按行为 */
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+        }
+
+        .yqh_scale {
+            margin-top: 14px;
+            font-size: 14px;
+            color: rgba(244, 241, 234, 0.75);
+            letter-spacing: 2px;
+        }
+
+        .yqh_hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(244, 241, 234, 0.45);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yqh_photo {
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="yqh_topbar">
+        <h1>图片缩放查看器</h1>
+        <a class="yqh_home" href="index.html">← 返回首页</a>
+    </header>
+
+    <!-- 要求 6：页面打开时的提示 -->
+    <div class="yqh_notice">提示：双指缩放请用手机打开（电脑浏览器没有触摸事件，双击可用鼠标模拟）</div>
+
+    <div class="yqh_stage" id="yqh_stage">
+        <img class="yqh_photo" id="yqh_photo" src="img/剁椒鱼头.png" alt="剁椒鱼头大图" draggable="false">
+    </div>
+
+    <div class="yqh_scale" id="yqh_scale">当前倍数：1.0x</div>
+    <div class="yqh_hint">双指捏合缩放 1~4 倍 · 单指拖动（放大后） · 双击切换 1x / 2x</div>
+
+    <script>
+        // ========== 基础引用与状态 ==========
+        var yqh_stage = document.getElementById('yqh_stage');   // 查看器容器
+        var yqh_photo = document.getElementById('yqh_photo');   // 大图
+        var yqh_scaleEl = document.getElementById('yqh_scale'); // 倍数显示
+
+        var yqh_scale = 1;   // 当前缩放倍数（1 ~ 4）
+        var yqh_tx = 0;      // 当前水平位移（px，相对图片居中位置）
+        var yqh_ty = 0;      // 当前垂直位移
+        var yqh_pinch = null;   // 双指缩放起始信息 {dist, scale, tx, ty, mx, my}
+        var yqh_drag = null;    // 单指拖动起始信息 {x, y}
+        var yqh_lastTap = 0;    // 上一次抬手时间戳（双击判定用）
+        var yqh_moved = 0;      // 本次触摸累计位移（用于排除"拖动后误判双击"）
+        var yqh_tapX = 0;       // 双击基准点（用第一次点按的位置）
+        var yqh_tapY = 0;
+
+        // yqh_clamp：把数值钳制在 [min, max] 区间内
+        function yqh_clamp(v, min, max) {
+            return Math.min(max, Math.max(min, v));
+        }
+
+        // yqh_twoDist：计算两个触点的直线距离（勾股定理）
+        function yqh_twoDist(a, b) {
+            var dx = a.clientX - b.clientX;
+            var dy = a.clientY - b.clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // yqh_twoMid：计算两个触点的中点（页面坐标）
+        function yqh_twoMid(a, b) {
+            return {
+                x: (a.clientX + b.clientX) / 2,
+                y: (a.clientY + b.clientY) / 2
+            };
+        }
+
+        // yqh_apply：把当前 scale / tx / ty 应用到图片上
+        // animated 为 true 时带 0.25s 过渡（双击切换），拖动/捏合时为 false 保证跟手
+        function yqh_apply(animated) {
+            yqh_photo.style.transition = animated ? 'transform 0.25s ease' : 'none';
+            yqh_photo.style.transform =
+                'translate(' + yqh_tx + 'px, ' + yqh_ty + 'px) scale(' + yqh_scale + ')';
+            yqh_scaleEl.textContent = '当前倍数：' + yqh_scale.toFixed(1) + 'x';
+        }
+
+        // yqh_limits：算出当前倍数下图片允许的最大位移（超边界会被钳回来）
+        // transform-origin 在中心，位移对称，所以上下左右限幅一样
+        function yqh_limits() {
+            var rect = yqh_stage.getBoundingClientRect();
+            // 放大后图片实际占用的尺寸 = 原始尺寸 × 倍数（object-fit:contain 下按容器短边算）
+            var w = yqh_photo.offsetWidth * yqh_scale;
+            var h = yqh_photo.offsetHeight * yqh_scale;
+            return {
+                x: Math.max(0, (w - rect.width) / 2),   // 水平可拖范围；未超出容器时为 0（自动居中）
+                y: Math.max(0, (h - rect.height) / 2)
+            };
+        }
+
+        // ========== 要求 2：touchstart 记录单指 / 双指状态与两指初始距离 ==========
+        yqh_stage.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 1) {
+                // 单指落下：记录起点，为拖动做准备（是否真的拖动看 move 时的 scale）
+                yqh_drag = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                yqh_moved = 0;
+                yqh_tapX = e.touches[0].clientX;
+                yqh_tapY = e.touches[0].clientY;
+            } else if (e.touches.length === 2) {
+                // 第二根手指落下：进入双指缩放状态
+                // 记录两指初始距离、当前倍数/位移、两指中点（缩放基准点）
+                var mid = yqh_twoMid(e.touches[0], e.touches[1]);
+                yqh_pinch = {
+                    dist: yqh_twoDist(e.touches[0], e.touches[1]), // 初始两指距离
+                    scale: yqh_scale,                              // 捏合开始时的倍数
+                    tx: yqh_tx,                                    // 开始时的位移
+                    ty: yqh_ty,
+                    mx: mid.x,                                     // 初始中点（页面坐标）
+                    my: mid.y
+                };
+                yqh_drag = null;   // 双指状态下不做拖动
+                yqh_lastTap = 0;   // 手势开始就取消待判定的双击
+            }
+        }, { passive: true });
+
+        // ========== 要求 3 / 4：touchmove 双指按比例缩放，单指放大后拖动 ==========
+        yqh_stage.addEventListener('touchmove', function (e) {
+            // 我们自己接管手势，阻止浏览器默认的页面缩放/滚动
+            e.preventDefault();
+
+            if (yqh_pinch && e.touches.length === 2) {
+                // --- 双指缩放 ---
+                var d = yqh_twoDist(e.touches[0], e.touches[1]);   // 当前两指距离
+                var mid = yqh_twoMid(e.touches[0], e.touches[1]);  // 当前两指中点
+                var rect = yqh_stage.getBoundingClientRect();
+
+                // 按距离比例算新倍数，钳制在 1 ~ 4 倍
+                var ns = yqh_clamp(yqh_pinch.scale * (d / yqh_pinch.dist), 1, 4);
+
+                // 以两指中点为缩放基准：捏合过程中中点指向的图片内容点不能跑
+                // 推导：屏幕位置 = 容器中心 + 位移 + (基准点偏移 × 倍数)
+                var cx = rect.left + rect.width / 2;   // 容器中心（页面坐标）
+                var cy = rect.top + rect.height / 2;
+                // 基准点在图片内部坐标（按捏合开始时的状态反推）
+                var p0x = (yqh_pinch.mx - cx - yqh_pinch.tx) / yqh_pinch.scale;
+                var p0y = (yqh_pinch.my - cy - yqh_pinch.ty) / yqh_pinch.scale;
+                // 新位移：让基准点在新倍数下仍停留在当前中点处
+                var nx = mid.x - cx - p0x * ns;
+                var ny = mid.y - cy - p0y * ns;
+
+                yqh_scale = ns;
+                yqh_tx = nx;
+                yqh_ty = ny;
+                yqh_apply(false);
+            } else if (e.touches.length === 1 && yqh_drag && yqh_scale > 1) {
+                // --- 单指拖动（仅放大后允许）---
+                var t = e.touches[0];
+                var dx = t.clientX - yqh_drag.x;
+                var dy = t.clientY - yqh_drag.y;
+                yqh_moved += Math.abs(dx) + Math.abs(dy); // 累计位移，供双击判定排除拖动
+                yqh_drag.x = t.clientX;
+                yqh_drag.y = t.clientY;
+                // 拖动过程先自由跟手，边界钳制放到松手时统一做（要求 4）
+                yqh_tx += dx;
+                yqh_ty += dy;
+                yqh_apply(false);
+            }
+        }, { passive: false });
+
+        // ========== 要求 4 / 5：touchend 松手回弹边界 + 双击切换 ==========
+        yqh_stage.addEventListener('touchend', function (e) {
+            // 剩余手指不足两根：结束捏合状态
+            if (e.touches.length < 2) {
+                yqh_pinch = null;
+            }
+            // 还剩一根手指（从双指变单指）：重置拖动起点，接着拖
+            if (e.touches.length === 1 && yqh_scale > 1) {
+                yqh_drag = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+
+            // 全部手指离开：收尾
+            if (e.touches.length === 0) {
+                yqh_drag = null;
+
+                // --- 松手后把图片钳制回边界内 ---
+                var lim = yqh_limits();
+                yqh_tx = yqh_clamp(yqh_tx, -lim.x, lim.x);
+                yqh_ty = yqh_clamp(yqh_ty, -lim.y, lim.y);
+                yqh_apply(true); // 带过渡的回弹
+
+                // --- 双击判定：300ms 内两次抬起、且没怎么移动 ---
+                var now = Date.now();
+                if (yqh_lastTap && now - yqh_lastTap < 300 && yqh_moved < 10) {
+                    // 已放大 → 回到 1x 并居中；是 1x → 放大到 2x（以双击位置为基准）
+                    if (yqh_scale > 1) {
+                        yqh_scale = 1;
+                        yqh_tx = 0;
+                        yqh_ty = 0;
+                    } else {
+                        var rect = yqh_stage.getBoundingClientRect();
+                        var cx = rect.left + rect.width / 2;
+                        var cy = rect.top + rect.height / 2;
+                        var ns = 2;
+                        // 与捏合同一套公式：让双击点在新倍数下位置保持不变
+                        var p0x = (yqh_tapX - cx - yqh_tx) / yqh_scale;
+                        var p0y = (yqh_tapY - cy - yqh_ty) / yqh_scale;
+                        yqh_scale = ns;
+                        yqh_tx = yqh_tapX - cx - p0x * ns;
+                        yqh_ty = yqh_tapY - cy - p0y * ns;
+                        // 2x 放大后同样不能超出边界
+                        var lim2 = yqh_limits();
+                        yqh_tx = yqh_clamp(yqh_tx, -lim2.x, lim2.x);
+                        yqh_ty = yqh_clamp(yqh_ty, -lim2.y, lim2.y);
+                    }
+                    yqh_apply(true); // 要求 5：0.25s 过渡
+                    yqh_lastTap = 0; // 消费掉这次双击
+                } else {
+                    yqh_lastTap = now;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

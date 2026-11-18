@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：移动端交互知识汇总页（触摸事件思考题 + 三个移动端实践页面入口）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>移动端交互：思考题与实践入口</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #14131a;
+            color: #f4f1ea;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+        }
+
+        .yqh_topbar {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .yqh_topbar h1 {
+            font-size: 17px;
+            letter-spacing: 1px;
+        }
+
+        .yqh_home {
+            font-size: 13px;
+            color: #ffb56b;
+            text-decoration: none;
+            border: 1px solid rgba(255, 181, 107, 0.5);
+            border-radius: 999px;
+            padding: 5px 12px;
+        }
+
+        .yqh_home:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 2px;
+        }
+
+        .yqh_list {
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* 每块任务区的公共卡片样式 */
+        .yqh_task {
+            border-radius: 18px;
+            padding: 20px;
+            background: rgba(244, 241, 234, 0.05);
+            border: 1px solid rgba(244, 241, 234, 0.12);
+        }
+
+        .yqh_task .yqh_no {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #ffb56b;
+        }
+
+        .yqh_task h2 {
+            font-size: 18px;
+            letter-spacing: 1px;
+            margin: 6px 0 12px;
+        }
+
+        /* 任务一：问答折叠列表 */
+        .yqh_faq {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .yqh_faq details {
+            border-radius: 12px;
+            background: rgba(244, 241, 234, 0.05);
+            border: 1px solid rgba(244, 241, 234, 0.1);
+        }
+
+        .yqh_faq summary {
+            padding: 12px 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .yqh_faq summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .yqh_faq summary::before {
+            content: "Q";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 50%;
+            background: rgba(255, 181, 107, 0.2);
+            color: #ffb56b;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        .yqh_faq summary:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 2px;
+            border-radius: 12px;
+        }
+
+        .yqh_faq .yqh_ans {
+            padding: 0 14px 12px 42px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(244, 241, 234, 0.78);
+        }
+
+        .yqh_faq .yqh_ans::before {
+            content: "A";
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 50%;
+            background: rgba(109, 200, 156, 0.18);
+            color: #6dc89c;
+            font-size: 11px;
+            margin-right: 8px;
+        }
+
+        /* 任务二~四：页面入口卡片 */
+        .yqh_entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .yqh_entry .yqh_info p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: rgba(244, 241, 234, 0.7);
+        }
+
+        .yqh_entry .yqh_file {
+            font-size: 12px;
+            color: rgba(244, 241, 234, 0.45);
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .yqh_link {
+            flex-shrink: 0;
+            font-size: 13px;
+            color: #14131a;
+            background: #ffb56b;
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 8px 16px;
+            white-space: nowrap;
+        }
+
+        .yqh_link:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 3px;
+        }
+
+        /* 三个入口卡片的差异化左侧描边色 */
+        .yqh_task.yqh_t2 { border-left: 3px solid #ff5e62; }
+        .yqh_task.yqh_t3 { border-left: 3px solid #185a9d; }
+        .yqh_task.yqh_t4 { border-left: 3px solid #6dc89c; }
+
+        .yqh_note {
+            width: 100%;
+            max-width: 460px;
+            margin-top: 26px;
+            border-top: 1px solid rgba(244, 241, 234, 0.12);
+            padding-top: 14px;
+            font-size: 12px;
+            color: rgba(244, 241, 234, 0.45);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <header class="yqh_topbar">
+        <h1>移动端交互汇总</h1>
+        <a class="yqh_home" href="index.html">← 返回首页</a>
+    </header>
+
+    <div class="yqh_list">
+        <!-- 任务一：触摸事件思考题 -->
+        <section class="yqh_task">
+            <span class="yqh_no">TASK 01 · 思考题</span>
+            <h2>触摸事件三问三答</h2>
+            <div class="yqh_faq">
+                <details>
+                    <summary>一次拖动里 touchmove 大约触发多少次、和距离有什么关系？</summary>
+                    <p class="yqh_ans">触发次数不固定，也不是"每移动一段距离触发一次"。它和屏幕刷新率/浏览器渲染帧同步：60Hz 屏幕上大约每 16ms 一次，即一秒最多约 60 次，一次 2 秒的拖动大约触发 120 次左右。所以触发次数取决于<b>拖动时长</b>，与移动距离没有固定对应关系——手指停着不动不触发，快速滑动时每次触发的两点间隔会更大，慢速拖动同样会高频触发。</p>
+                </details>
+                <details>
+                    <summary>click 出现在 touchend 之前还是之后？</summary>
+                    <p class="yqh_ans">之后。移动端的 click 是浏览器对"轻触"合成的延迟事件：手指按下（touchstart）→ 移动（touchmove）→ 抬起（touchend）之后，浏览器才判断这是一次点按并补发 click（现代浏览器延迟已很小，但顺序不变）。正因为如此，如果在 touchend 里调用 preventDefault()，浏览器就不再合成 click——做自定义手势时常用这一招来防止"滑完还误触点击"。</p>
+                </details>
+                <details>
+                    <summary>如果把 touchend 换成 touchcancel，会发生什么？</summary>
+                    <p class="yqh_ans">正常抬手将失去响应。touchcancel 只在触摸被系统或浏览器"没收"时触发，比如来电、弹出通知手势、浏览器判定手势用于页面滚动而接管了触摸、触摸点数量突变等。换成 touchcancel 后，用户正常松开手指走的是 touchend，监听器收不到，滑动/缩放逻辑就"卡住"了。正确做法是 touchend 和 touchcancel 同时监听：end 处理正常结果，cancel 做状态清理与复位。</p>
+                </details>
+            </div>
+        </section>
+
+        <!-- 任务二：滑动切换美食卡片 -->
+        <section class="yqh_task yqh_t2">
+            <span class="yqh_no">TASK 02 · 实践页</span>
+            <h2>滑动切换美食卡片</h2>
+            <div class="yqh_entry">
+                <div class="yqh_info">
+                    <p>touchstart / touchend 记录 changedTouches[0]，横向位移超 40px 切换卡片，左滑下一张、右滑上一张，边界给提示，0.3s 过渡 + 300ms 冷却防连滑，容器 touch-action: pan-y。</p>
+                    <p class="yqh_file">mobile-gesture.html</p>
+                </div>
+                <a class="yqh_link" href="./mobile-gesture.html">进入练习</a>
+            </div>
+        </section>
+
+        <!-- 任务三：图片缩放查看器 -->
+        <section class="yqh_task yqh_t3">
+            <span class="yqh_no">TASK 03 · 实践页</span>
+            <h2>图片缩放查看器</h2>
+            <div class="yqh_entry">
+                <div class="yqh_info">
+                    <p>双指捏合按距离比例缩放 1~4 倍（以两指中点为基准），单指放大后拖动、松手钳回边界，双击在 1x / 2x 间 0.25s 过渡切换，容器 overflow:hidden + touch-action:none。</p>
+                    <p class="yqh_file">mobile-zoom.html</p>
+                </div>
+                <a class="yqh_link" href="./mobile-zoom.html">进入练习</a>
+            </div>
+        </section>
+
+        <!-- 任务四：摇一摇抽菜谱 -->
+        <section class="yqh_task yqh_t4">
+            <span class="yqh_no">TASK 04 · 实践页</span>
+            <h2>摇一摇抽菜谱</h2>
+            <div class="yqh_entry">
+                <div class="yqh_info">
+                    <p>监听 devicemotion 的 accelerationIncludingGravity 算合成加速度，超 18 判定摇动、1.5s 冷却防重复，随机抽菜带弹出动画；设备不支持时降级为按钮抽取。</p>
+                    <p class="yqh_file">mobile-sensor.html</p>
+                </div>
+                <a class="yqh_link" href="./mobile-sensor.html">进入练习</a>
+            </div>
+        </section>
+    </div>
+
+    <p class="yqh_note">作者：尹清华（24002120605）· 移动端交互专题：事件机制 + 滑动 + 缩放 + 传感器三个实践页入口。</p>
+</body>
+</html>

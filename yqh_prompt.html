@@ -362,7 +362,12 @@
 <p><strong>提示词：</strong></p>
 <p>swiper-task里面的ai提示词也是全部内容</p>
 <p><strong>执行说明：</strong> 经确认采用入口链接方式：swiper-task.html 底部仅保留「查看 AI 提示词记录 →」，指向 yqh_prompt.html；该页已完整收录 59 条记录（不再按日期过滤），本次无需改代码。</p>
+<hr>
+<h2>2026-11-13 14:02:20 | 模型：DeepSeek-V4.1-Flash</h2>
+<p><strong>提示词：</strong></p>
+<p>给我新建一个html文件，显示上图下文的结构，图片和文字通过本地启动服务器获取当前文件夹下面的db里面db.json的poems里面的图片，title和content。并给我生成server.js数据服务器文件，server.js放在db文件夹中。其中端口号为3004。</p>
+<p><strong>执行说明：</strong> 新建 yqh-poems.html（上图下文卡片，fetch /api/poems）与 db/server.js（express，端口 3004，静态根为仓库根目录，接口 /api/poems 读 db.json 的 poems）；db.json 中图片字段实为 pic，按 pic 取图并为 img 加 referrerPolicy=no-referrer 绕过码云防盗链；实测 4 张卡片与图片全部正常。</p>
 </div>
-<p class="yqh_count">60 条记录 · 由 yqh_prompt.md 自动生成</p>
+<p class="yqh_count">61 条记录 · 由 yqh_prompt.md 自动生成</p>
 </body>
 </html>

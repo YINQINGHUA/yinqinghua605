@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：摇一摇抽今日菜谱（devicemotion 加速度检测 + 1.5s 冷却 + 不支持降级按钮）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>移动端传感器：摇一摇抽菜谱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #14131a;
+            color: #f4f1ea;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+        }
+
+        .yqh_topbar {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .yqh_topbar h1 {
+            font-size: 17px;
+            letter-spacing: 1px;
+        }
+
+        .yqh_home {
+            font-size: 13px;
+            color: #ffb56b;
+            text-decoration: none;
+            border: 1px solid rgba(255, 181, 107, 0.5);
+            border-radius: 999px;
+            padding: 5px 12px;
+        }
+
+        .yqh_home:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 2px;
+        }
+
+        .yqh_lead {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 26px;
+        }
+
+        /* 结果展示卡片：摇到菜之后弹出动画作用在这里 */
+        .yqh_result {
+            width: 100%;
+            max-width: 380px;
+            min-height: 180px;
+            border-radius: 20px;
+            padding: 26px 22px;
+            background: linear-gradient(150deg, #ff9a56, #ff5e62);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        .yqh_result span {
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0.85;
+        }
+
+        .yqh_result h2 {
+            font-size: 30px;
+            letter-spacing: 2px;
+        }
+
+        .yqh_result p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.94;
+        }
+
+        /* 要求 4：抽中时的弹出动画（放大 + 轻微回弹） */
+        @keyframes yqh_pop {
+            0%   { transform: scale(0.6); opacity: 0; }
+            60%  { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .yqh_result.yqh_pop {
+            animation: yqh_pop 0.4s ease both;
+        }
+
+        /* 要求 5：不支持时的降级提示区 */
+        .yqh_fallback {
+            margin-top: 22px;
+            font-size: 13px;
+            color: #ff8a7a;
+            text-align: center;
+            display: none;
+        }
+
+        .yqh_fallback.yqh_show {
+            display: block;
+        }
+
+        .yqh_btn {
+            margin-top: 12px;
+            font-size: 15px;
+            color: #14131a;
+            background: #ffb56b;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 30px;
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+
+        .yqh_btn:active {
+            transform: scale(0.96);
+        }
+
+        .yqh_btn:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 3px;
+        }
+
+        .yqh_counter {
+            margin-top: 16px;
+            font-size: 13px;
+            color: rgba(244, 241, 234, 0.55);
+        }
+
+        /* 要求 6：为什么必须做降级的说明 */
+        .yqh_note {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 28px;
+            border-top: 1px solid rgba(244, 241, 234, 0.12);
+            padding-top: 16px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(244, 241, 234, 0.6);
+        }
+
+        .yqh_note strong {
+            color: #ffb56b;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yqh_result.yqh_pop {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="yqh_topbar">
+        <h1>摇一摇 · 抽菜谱</h1>
+        <a class="yqh_home" href="index.html">← 返回首页</a>
+    </header>
+
+    <!-- 要求 1：提示语 -->
+    <p class="yqh_lead">摇一摇手机，抽今日菜谱</p>
+
+    <!-- 下方显示结果 -->
+    <section class="yqh_result" id="yqh_result">
+        <span>TODAY'S DISH</span>
+        <h2 id="yqh_name">等待摇动…</h2>
+        <p id="yqh_desc">拿起手机晃一晃，让传感器帮你决定今天吃什么。</p>
+    </section>
+
+    <div class="yqh_counter" id="yqh_counter">已摇次数：0</div>
+
+    <!-- 要求 5：不支持时的降级提示 + 按钮 -->
+    <div class="yqh_fallback" id="yqh_fallback">
+        <p id="yqh_fallback_text">当前设备不支持，请用手机打开</p>
+        <button class="yqh_btn" id="yqh_btn" type="button">点我抽一次</button>
+    </div>
+
+    <!-- 要求 6：为什么必须做降级（姓名学号见页头注释与本说明） -->
+    <section class="yqh_note">
+        <p><strong>作者：尹清华（24002120605）——为什么必须做降级？</strong></p>
+        <p>devicemotion 是移动端私有能力，电脑浏览器大多没有加速度计，触发不了事件或数据恒为 null；
+        即便在手机上，iOS 13+ 还要用户授权（requestPermission），安卓各厂商的实现和数值单位也不统一。
+        如果页面只依赖传感器，那在电脑上交作业、未授权的 iPhone 上都会"摇了没反应"，
+        用户根本分不清是坏的还是没摇够。所以必须在检测不到事件或没有有效数据时给出明确提示，
+        并提供一个按钮版本的随机抽取作为降级方案——保证任何环境下功能都有可用出口，
+        这也是渐进增强（Progressive Enhancement）的思路：核心体验给支持的设备，基础能力人人可用。</p>
+    </section>
+
+    <script>
+        // 菜谱数据：摇一摇随机抽一道
+        var yqh_dishes = [
+            { name: '麻婆豆腐', desc: '麻辣鲜香烫，一勺浇在热米饭上最是下饭。' },
+            { name: '白灼虾', desc: '沸水快灼蘸豉油，吃的就是原汁原味的清甜。' },
+            { name: '剁椒鱼头', desc: '红剁椒旺火蒸透，鲜辣汁水最后拌一碗面。' },
+            { name: '狮子头', desc: '小火煨至酥烂入口即化，清汤衬出温润本味。' },
+            { name: '西红柿炒蛋', desc: '国民家常菜，酸甜汤汁拌饭三碗不过分。' },
+            { name: '可乐鸡翅', desc: '甜咸焦香色泽红亮，新手也能一次成功。' }
+        ];
+
+        var yqh_result = document.getElementById('yqh_result');   // 结果卡片
+        var yqh_name = document.getElementById('yqh_name');       // 菜名
+        var yqh_desc = document.getElementById('yqh_desc');       // 简介
+        var yqh_counter = document.getElementById('yqh_counter'); // 次数
+        var yqh_fallback = document.getElementById('yqh_fallback'); // 降级提示区
+        var yqh_fallback_text = document.getElementById('yqh_fallback_text');
+        var yqh_btn = document.getElementById('yqh_btn');         // 降级按钮
+
+        var yqh_threshold = 18;      // 要求 3：判定摇动的合成加速度阈值
+        var yqh_cooldown = 1500;     // 要求 3：触发后的冷却时间（毫秒）
+        var yqh_lastTime = 0;        // 上一次成功触发的时间戳
+        var yqh_count = 0;           // 已抽次数
+        var yqh_motionOk = false;    // 是否收到过有效的传感器数据
+        var yqh_granted = false;     // iOS 授权是否已通过
+
+        // yqh_popResult：随机抽一道菜并显示，重置动画类触发弹出效果
+        function yqh_popResult() {
+            var dish = yqh_dishes[Math.floor(Math.random() * yqh_dishes.length)];
+            yqh_name.textContent = dish.name;
+            yqh_desc.textContent = dish.desc;
+            yqh_count++;
+            yqh_counter.textContent = '已摇次数：' + yqh_count;
+            // 先移除动画类，强制浏览器重排后再加回来，保证连续抽取时动画能重新播放
+            yqh_result.classList.remove('yqh_pop');
+            void yqh_result.offsetWidth;
+            yqh_result.classList.add('yqh_pop');
+        }
+
+        // yqh_showFallback：显示降级提示（传文字区分"不支持"和"需授权"）
+        function yqh_showFallback(text) {
+            yqh_fallback_text.textContent = text;
+            yqh_fallback.classList.add('yqh_show');
+        }
+
+        // yqh_requestPermission：iOS 13+ 需要在用户手势里申请传感器权限
+        function yqh_requestPermission() {
+            if (yqh_granted) {
+                return;
+            }
+            // 非 iOS（没有 requestPermission 方法）直接视为已授权
+            if (typeof DeviceMotionEvent === 'undefined' ||
+                typeof DeviceMotionEvent.requestPermission !== 'function') {
+                yqh_granted = true;
+                return;
+            }
+            DeviceMotionEvent.requestPermission().then(function (state) {
+                if (state === 'granted') {
+                    yqh_granted = true;
+                    yqh_fallback.classList.remove('yqh_show');
+                } else {
+                    yqh_showFallback('未授权传感器，可点按钮抽取');
+                }
+            }).catch(function () {
+                yqh_showFallback('未授权传感器，可点按钮抽取');
+            });
+        }
+
+        // ========== 要求 2 / 3：监听 devicemotion，算合成加速度，超阈值 + 冷却判定 ==========
+        window.addEventListener('devicemotion', function (e) {
+            var g = e.accelerationIncludingGravity;
+            // 有事件但拿不到数据（部分浏览器模拟环境）：同样走降级
+            if (!g || g.x === null || g.y === null || g.z === null) {
+                return;
+            }
+            yqh_motionOk = true; // 收到过有效数据，说明设备支持
+            yqh_fallback.classList.remove('yqh_show');
+
+            // 合成加速度 = 三个轴分量平方和开根号（合矢量大小）
+            var acc = Math.sqrt(g.x * g.x + g.y * g.y + g.z * g.z);
+            var now = Date.now();
+            // 超过阈值 且 已过 1.5s 冷却期 才触发，防止一次摇动连续触发多次
+            if (acc > yqh_threshold && now - yqh_lastTime > yqh_cooldown) {
+                yqh_lastTime = now;
+                yqh_popResult();
+            }
+        });
+
+        // 要求 5：打开 2 秒后仍没收到任何有效传感器数据 → 判定不支持，降级
+        setTimeout(function () {
+            if (!yqh_motionOk) {
+                yqh_showFallback('当前设备不支持，请用手机打开');
+            }
+        }, 2000);
+
+        // iOS 上的首次交互尝试申请权限（requestPermission 必须由用户手势触发）
+        document.body.addEventListener('touchend', function () {
+            yqh_requestPermission();
+        }, { once: true });
+
+        // 降级按钮：无论传感器是否可用，点了就直接抽一次
+        yqh_btn.addEventListener('click', function () {
+            yqh_requestPermission();
+            yqh_popResult();
+        });
+    </script>
+</body>
+</html>

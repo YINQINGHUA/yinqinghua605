@@ -673,3 +673,84 @@ index删除swiper-moduhao
 swiper-task里面的ai提示词也是全部内容
 
 **执行说明：** 经确认采用入口链接方式：swiper-task.html 底部仅保留「查看 AI 提示词记录 →」，指向 yqh_prompt.html；该页已完整收录 59 条记录（不再按日期过滤），本次无需改代码。
+
+---
+
+## 2026-11-13 14:02:20 | 模型：DeepSeek-V4.1-Flash
+
+**提示词：**
+
+给我新建一个html文件，显示上图下文的结构，图片和文字通过本地启动服务器获取当前文件夹下面的db里面db.json的poems里面的图片，title和content。并给我生成server.js数据服务器文件，server.js放在db文件夹中。其中端口号为3004。
+
+**执行说明：** 新建 yqh-poems.html（上图下文卡片，fetch /api/poems）与 db/server.js（express，端口 3004，静态根为仓库根目录，接口 /api/poems 读 db.json 的 poems）；db.json 中图片字段实为 pic，按 pic 取图并为 img 加 referrerPolicy=no-referrer 绕过码云防盗链；实测 4 张卡片与图片全部正常。
+
+---
+
+## 2026-11-18 13:59:55 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在项目中新建移动端页面 mobile-gesture.html：
+1、页面显示一张美食卡片，共 4 道菜（菜名、简介、渐变背景），底部显示"第 1/4 张"；
+2、监听 touchstart / touchend，用 changedTouches[0] 计算横向位移，阈值 40px；
+3、左滑切到下一张，右滑切到上一张，边界时给出提示文字"已经是第一张/最后一张"；
+4、卡片容器加 touch-action: pan-y，保证纵向还能滚动页面；
+5、切换时加 0.3s 过渡动画，并防止快速连滑一次跳两张（加 300ms 冷却）；
+
+**执行说明/执行计划：** 新建 mobile-gesture.html（yqh_ 前缀命名、含文件头注释与返回首页链接），实现 4 张美食卡片触摸滑动切换：touchstart/touchend 记录 changedTouches[0] 坐标算横向位移，阈值 40px，左滑下一张/右滑上一张，边界显示提示文字，卡片容器 touch-action: pan-y，切换 0.3s 过渡 + 300ms 冷却防连滑；同步在 index.html 课堂目录补一条入口。
+
+---
+
+## 2026-11-18 14:04:59 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+将这四个（麻婆豆腐.jpg、白灼虾.webp、剁椒鱼头.png、狮子头.jpg）放到一个 img 文件夹里，然后根据名称插入 mobile-gesture 里。
+
+**执行说明/执行计划：** 在仓库根新建 img 目录，把桌面上四张菜品图片按原名复制进去；在 mobile-gesture.html 每张美食卡片的渐变背景上层按菜名对应插入 <img>（alt 用菜名），保持触摸滑动逻辑不变。
+
+---
+
+## 2026-11-18 14:08:52 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在项目中新建 mobile-zoom.html，实现移动端图片查看器：
+1、一张大图放在容器里，容器 overflow:hidden，touch-action:none，user-select:none；
+2、touchstart 记录单指/双指状态与两指初始距离；
+3、touchmove 双指时按距离比例缩放（1～4 倍），以两指中点为缩放基准；
+4、单指且 scale>1 时拖动图片，松手后限制在边界内；
+5、双击在 1x 与 2x 之间切换，带 0.25s 过渡；
+6、页面打开时提示"双指缩放请用手机打开"，所有逻辑写清注释
+
+**执行说明/执行计划：** 新建 mobile-zoom.html（yqh_ 前缀、文件头注释、返回首页链接），查看器容器 overflow:hidden + touch-action:none + user-select:none；touchstart 区分单指/双指并记录两指初始距离与中点；touchmove 双指按距离比例缩放 1~4 倍（以两指中点为缩放基准）、单指且 scale>1 时拖动，touchend 松手后钳制回边界；双击（300ms 内两次 touchend）在 1x/2x 间 0.25s 过渡切换；页面顶部常驻提示"双指缩放请用手机打开"；全部逻辑加中文注释；同步在 index.html 课堂目录补第 12 条入口。
+
+---
+
+## 2026-11-18 14:10:53 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在项目中新建 mobile-sensor.html，实现"摇一摇"功能：
+1、页面提示"摇一摇手机，抽今日菜谱"，下方显示结果；
+2、监听 devicemotion，取 accelerationIncludingGravity 计算合成加速度；
+3、超过阈值（约 18）判定为摇动，触发后进入 1.5 秒冷却，防止一次摇动重复触发；
+4、随机抽取一道菜显示出来，带简单的弹出动画；
+5、检测不到该事件或没有数据时，显示"当前设备不支持，请用手机打开"，并提供"点我抽一次"的按钮作为降级方案；
+6、变量以 yqh_ 开头，写明姓名学号，附一段说明：为什么必须做降级。
+
+**执行说明/执行计划：** 新建 mobile-sensor.html（yqh_ 前缀、文件头注明作者尹清华 24002120605、返回首页链接）：页面提示"摇一摇手机，抽今日菜谱"，监听 devicemotion 的 accelerationIncludingGravity 计算合成加速度，超阈值 18 且距上次触发 1.5s 冷却后随机抽一道菜并加弹出动画；2 秒内收不到 devicemotion 或无传感器数据时降级为"当前设备不支持，请用手机打开"+"点我抽一次"按钮（兼容 iOS 需 requestPermission 授权）；页面底部附"为什么必须做降级"说明段；同步在 index.html 课堂目录补第 13 条入口。
+
+---
+
+## 2026-11-18 14:55:04 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在生成一个 mobile-interaction.html，里面有任务一二三四，四块任务区。
+任务一是三个问题和对应的答案：① 一次拖动里 touchmove 大约触发多少次、和距离有什么关系？② click 出现在 touchend 之前还是之后？③ 如果把 touchend 换成 touchcancel，会发生什么？
+任务二是 mobile-gesture.html
+任务三是 mobile-zoom.html
+任务四是 mobile-sensor.html
+
+**执行说明/执行计划：** 新建 mobile-interaction.html（yqh_ 前缀、文件头注释、返回首页链接）：四个任务区卡片，任务一用可展开的问答形式给出三道触摸事件思考题的答案（touchmove 与帧同步约 60 次/秒、与时长相关而与距离无固定对应；click 在 touchend 之后、touchend 里 preventDefault 会阻止 click；touchcancel 只在系统中断时触发、正常抬手不再响应，应两者都监听）；任务二/三/四分别是滑动切换、缩放查看器、摇一摇三个页面的入口卡片（链接 + 一句话介绍）；同步在 index.html 课堂目录补第 14 条入口。
