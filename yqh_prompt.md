@@ -774,3 +774,13 @@ swiper-task里面的ai提示词也是全部内容
 插入任务三、任务四视频到"进入练习"里面那个页面。
 
 **执行说明/执行计划：** 在 mobile-zoom.html（任务三图片缩放查看器）页面底部新增"演示视频"区块，嵌入 video/任务三.mp4；在 mobile-sensor.html（任务四摇一摇抽菜谱）页面底部新增"演示视频"区块，嵌入 video/任务四.mp4；均用 <video controls playsinline>，样式与页面暗色风格一致。
+
+---
+
+## 2026-11-20 08:33:31 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+跟新全部提交。
+
+**执行说明/执行计划：** 在 .gitignore 追加 db/node_modules/（依赖目录）与 .trae-html-share-packages/（约 30MB 临时分享包）两条忽略规则，使 git status 彻底干净；随后 git add -A 提交全部（实际为 .gitignore 一项）并推送到 GitHub。
