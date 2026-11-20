@@ -754,3 +754,23 @@ swiper-task里面的ai提示词也是全部内容
 任务四是 mobile-sensor.html
 
 **执行说明/执行计划：** 新建 mobile-interaction.html（yqh_ 前缀、文件头注释、返回首页链接）：四个任务区卡片，任务一用可展开的问答形式给出三道触摸事件思考题的答案（touchmove 与帧同步约 60 次/秒、与时长相关而与距离无固定对应；click 在 touchend 之后、touchend 里 preventDefault 会阻止 click；touchcancel 只在系统中断时触发、正常抬手不再响应，应两者都监听）；任务二/三/四分别是滑动切换、缩放查看器、摇一摇三个页面的入口卡片（链接 + 一句话介绍）；同步在 index.html 课堂目录补第 14 条入口。
+
+---
+
+## 2026-11-20 08:13:06 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+在 mobile-interaction.html 里面任务三里插入任务三视频（任务三.mp4），任务四插入任务四视频（任务四.mp4）。
+
+**执行说明/执行计划：** 在仓库根新建 video 目录，把桌面上"任务三.mp4""任务四.mp4"复制进去；在 mobile-interaction.html 任务三（图片缩放查看器）和任务四（摇一摇抽菜谱）卡片内分别加 <video controls> 标签引用对应视频，样式适配卡片宽度；同步更新 yqh_prompt 记录。
+
+---
+
+## 2026-11-20 08:27:01 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+插入任务三、任务四视频到"进入练习"里面那个页面。
+
+**执行说明/执行计划：** 在 mobile-zoom.html（任务三图片缩放查看器）页面底部新增"演示视频"区块，嵌入 video/任务三.mp4；在 mobile-sensor.html（任务四摇一摇抽菜谱）页面底部新增"演示视频"区块，嵌入 video/任务四.mp4；均用 <video controls playsinline>，样式与页面暗色风格一致。

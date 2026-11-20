@@ -162,6 +162,28 @@
             color: #ffb56b;
         }
 
+        /* 页面底部的演示视频区块 */
+        .yqh_demo {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 24px;
+        }
+
+        .yqh_demo h2 {
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #ffb56b;
+            margin-bottom: 10px;
+        }
+
+        .yqh_demo video {
+            width: 100%;
+            display: block;
+            border-radius: 14px;
+            background: #000;
+            border: 1px solid rgba(244, 241, 234, 0.12);
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .yqh_result.yqh_pop {
                 animation: none;
@@ -202,6 +224,12 @@
         用户根本分不清是坏的还是没摇够。所以必须在检测不到事件或没有有效数据时给出明确提示，
         并提供一个按钮版本的随机抽取作为降级方案——保证任何环境下功能都有可用出口，
         这也是渐进增强（Progressive Enhancement）的思路：核心体验给支持的设备，基础能力人人可用。</p>
+    </section>
+
+    <!-- 手机真机操作演示视频 -->
+    <section class="yqh_demo">
+        <h2>演示视频</h2>
+        <video src="video/任务四.mp4" controls preload="metadata" playsinline></video>
     </section>
 
     <script>

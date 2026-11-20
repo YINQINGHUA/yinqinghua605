@@ -113,6 +113,28 @@
             color: rgba(244, 241, 234, 0.45);
         }
 
+        /* 页面底部的演示视频区块 */
+        .yqh_demo {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 24px;
+        }
+
+        .yqh_demo h2 {
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #ffb56b;
+            margin-bottom: 10px;
+        }
+
+        .yqh_demo video {
+            width: 100%;
+            display: block;
+            border-radius: 14px;
+            background: #000;
+            border: 1px solid rgba(244, 241, 234, 0.12);
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .yqh_photo {
                 transition: none !important;
@@ -135,6 +157,12 @@
 
     <div class="yqh_scale" id="yqh_scale">当前倍数：1.0x</div>
     <div class="yqh_hint">双指捏合缩放 1~4 倍 · 单指拖动（放大后） · 双击切换 1x / 2x</div>
+
+    <!-- 手机真机操作演示视频 -->
+    <section class="yqh_demo">
+        <h2>演示视频</h2>
+        <video src="video/任务三.mp4" controls preload="metadata" playsinline></video>
+    </section>
 
     <script>
         // ========== 基础引用与状态 ==========
