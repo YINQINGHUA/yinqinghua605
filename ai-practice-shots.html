@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<!--
+  作者：尹清华（24002120605）
+  建立时间：2026-11-25
+  使用大模型：GLM-5.3-Flash
+  功能名称：课堂实践测试截图汇总页（AI 实践五个任务的运行截图与说明，支持点击放大查看）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>课堂实践测试截图：AI 能力实践五任务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #14131a;
+            background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(102, 126, 234, 0.18), transparent);
+            color: #f4f1ea;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+        }
+
+        .yqh_topbar {
+            width: 100%;
+            max-width: 760px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .yqh_topbar h1 {
+            font-size: 17px;
+            letter-spacing: 1px;
+        }
+
+        .yqh_home {
+            font-size: 13px;
+            color: #ffb56b;
+            text-decoration: none;
+            border: 1px solid rgba(255, 181, 107, 0.5);
+            border-radius: 999px;
+            padding: 5px 12px;
+        }
+
+        .yqh_home:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 2px;
+        }
+
+        .yqh_intro {
+            width: 100%;
+            max-width: 760px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(244, 241, 234, 0.65);
+            border-left: 3px solid #667eea;
+            padding-left: 12px;
+            margin-bottom: 26px;
+        }
+
+        .yqh_intro b {
+            color: #aeb8ff;
+            font-weight: 600;
+        }
+
+        /* 每个任务区块 */
+        .yqh_task {
+            width: 100%;
+            max-width: 760px;
+            border-radius: 18px;
+            padding: 20px;
+            background: rgba(244, 241, 234, 0.05);
+            border: 1px solid rgba(244, 241, 234, 0.12);
+            margin-bottom: 22px;
+        }
+
+        .yqh_task .yqh_no {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #ffb56b;
+        }
+
+        .yqh_task h2 {
+            font-size: 18px;
+            letter-spacing: 1px;
+            margin: 6px 0 8px;
+        }
+
+        .yqh_task .yqh_desc {
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(244, 241, 234, 0.72);
+            margin-bottom: 16px;
+        }
+
+        .yqh_task .yqh_endpoint {
+            display: inline-block;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #7ee0a3;
+            background: rgba(126, 224, 163, 0.1);
+            border: 1px solid rgba(126, 224, 163, 0.25);
+            border-radius: 8px;
+            padding: 4px 10px;
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+
+        /* 截图网格：两图并排、单图占满 */
+        .yqh_shots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .yqh_shot {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .yqh_shot img {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            border: 1px solid rgba(244, 241, 234, 0.15);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .yqh_shot:hover img,
+        .yqh_shot:focus-visible img {
+            transform: translateY(-3px);
+            border-color: rgba(255, 181, 107, 0.6);
+        }
+
+        .yqh_shot:focus-visible {
+            outline: 2px solid #ffb56b;
+            outline-offset: 3px;
+            border-radius: 12px;
+        }
+
+        .yqh_shot figcaption {
+            font-size: 12px;
+            line-height: 1.7;
+            color: rgba(244, 241, 234, 0.55);
+            margin-top: 8px;
+        }
+
+        .yqh_shot figcaption::before {
+            content: "▣ ";
+            color: #ffb56b;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yqh_shot img {
+                transition: none;
+            }
+
+            .yqh_shot:hover img {
+                transform: none;
+            }
+        }
+
+        /* 点击放大查看的遮罩层 */
+        .yqh_lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 9, 14, 0.92);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            z-index: 99;
+        }
+
+        .yqh_lightbox.yqh_open {
+            display: flex;
+        }
+
+        .yqh_lightbox img {
+            max-width: 100%;
+            max-height: 88vh;
+            border-radius: 10px;
+            border: 1px solid rgba(244, 241, 234, 0.2);
+        }
+
+        .yqh_lightbox .yqh_tip {
+            position: fixed;
+            top: 14px;
+            right: 20px;
+            font-size: 13px;
+            color: rgba(244, 241, 234, 0.7);
+            background: rgba(244, 241, 234, 0.08);
+            border: 1px solid rgba(244, 241, 234, 0.2);
+            border-radius: 999px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+
+        .yqh_note {
+            width: 100%;
+            max-width: 760px;
+            margin-top: 4px;
+            border-top: 1px solid rgba(244, 241, 234, 0.12);
+            padding-top: 14px;
+            font-size: 12px;
+            color: rgba(244, 241, 234, 0.45);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <header class="yqh_topbar">
+        <h1>课堂实践测试截图</h1>
+        <a class="yqh_home" href="index.html">← 返回首页</a>
+    </header>
+
+    <p class="yqh_intro">
+        本次课堂实践基于 <b>Node.js 本地服务（localhost:8605）</b>搭建的美食主题 AI 应用，共完成 <b>五个任务</b>：在线客服、多平台模型切换、知识库 RAG 问答、图像识别与语音识别。以下为各任务的实际运行截图，<b>点击任意截图可放大查看</b>。
+    </p>
+
+    <!-- 任务一：在线客服 -->
+    <section class="yqh_task">
+        <span class="yqh_no">TASK 01 · 在线客服</span>
+        <h2>美食街在线客服「小美」</h2>
+        <p class="yqh_desc">接入大模型的对话式客服页面：能回答营业时间、招牌菜推荐、配送范围等业务问题；对超出服务范围的提问（写 Python 排序代码、股市行情）礼貌拒答，守住业务边界。</p>
+        <span class="yqh_endpoint">POST http://localhost:8605/api/customer-service</span>
+        <div class="yqh_shots">
+            <a class="yqh_shot" href="shots/任务1-在线客服1.png" target="_blank">
+                <figure>
+                    <img src="shots/任务1-在线客服1.png" alt="在线客服：营业时间与招牌菜问答" loading="lazy">
+                    <figcaption>问候语 + 营业时间（周一至周日 10:00-22:00）与今日招牌菜推荐问答</figcaption>
+                </figure>
+            </a>
+            <a class="yqh_shot" href="shots/任务1-在线客服2.png" target="_blank">
+                <figure>
+                    <img src="shots/任务1-在线客服2.png" alt="在线客服：配送范围与超范围拒答" loading="lazy">
+                    <figcaption>3 公里内免费配送判断正确；写代码、问股市等超范围问题均礼貌拒绝</figcaption>
+                </figure>
+            </a>
+        </div>
+    </section>
+
+    <!-- 任务二：多平台切换 -->
+    <section class="yqh_task">
+        <span class="yqh_no">TASK 02 · 多平台切换</span>
+        <h2>服务商在线切换（硅基流动 / 七牛）</h2>
+        <p class="yqh_desc">同一客服页面右上角下拉框可在大模型服务商之间切换：当前为「硅基流动」，切到「七牛」后无需改代码，后端按所选服务商转发请求，验证了多平台接入层的可替换性。</p>
+        <span class="yqh_endpoint">POST /api/customer-service（服务商：硅基流动 ⇄ 七牛）</span>
+        <div class="yqh_shots">
+            <a class="yqh_shot" href="shots/任务2-多平台切换1.png" target="_blank">
+                <figure>
+                    <img src="shots/任务2-多平台切换1.png" alt="服务商下拉框展开，当前硅基流动、可切换七牛" loading="lazy">
+                    <figcaption>服务商下拉框展开：当前「硅基流动」，可选「七牛」</figcaption>
+                </figure>
+            </a>
+            <a class="yqh_shot" href="shots/任务2-多平台切换2.png" target="_blank">
+                <figure>
+                    <img src="shots/任务2-多平台切换2.png" alt="切换到七牛后对话正常" loading="lazy">
+                    <figcaption>切换服务商后对话流程与回答质量保持一致，接口不变</figcaption>
+                </figure>
+            </a>
+        </div>
+    </section>
+
+    <!-- 任务三：知识库 -->
+    <section class="yqh_task">
+        <span class="yqh_no">TASK 03 · 知识库</span>
+        <h2>知识库文件上传与 RAG 问答</h2>
+        <p class="yqh_desc">管理页上传《中华美食知识库》.docx 文档，后端自动解析分块入库；问答页基于已上传文档做 RAG 检索增强回答，八大菜系、烹饪技法、经典小吃都能准确作答。</p>
+        <span class="yqh_endpoint">POST /api/kb/upload · GET/DELETE /api/kb/documents · POST /api/customer-service（useKb:true）</span>
+        <div class="yqh_shots">
+            <a class="yqh_shot" href="shots/任务3-知识库文件上传功.png" target="_blank">
+                <figure>
+                    <img src="shots/任务3-知识库文件上传功.png" alt="知识库管理：两个 docx 文档已上传并分块" loading="lazy">
+                    <figcaption>知识库管理页：两份 docx 已入库（自动分为 3 / 4 个分块），支持删除</figcaption>
+                </figure>
+            </a>
+            <a class="yqh_shot" href="shots/任务3-知识库问答.png" target="_blank">
+                <figure>
+                    <img src="shots/任务3-知识库问答.png" alt="知识库问答：回答八大菜系" loading="lazy">
+                    <figcaption>知识库问答页：问「八大菜系」，基于已上传文档给出完整准确的回答</figcaption>
+                </figure>
+            </a>
+        </div>
+    </section>
+
+    <!-- 任务四：图像识别 -->
+    <section class="yqh_task">
+        <span class="yqh_no">TASK 04 · 图像识别</span>
+        <h2>AI 视觉模型图片描述</h2>
+        <p class="yqh_desc">上传一张图片，视觉模型生成中文描述：对高原峡谷风景图的色彩、光影、构图描述准确细腻，「识别成功」状态与左图右文布局直观展示结果。</p>
+        <span class="yqh_endpoint">POST http://localhost:8605/api/image-recognition</span>
+        <div class="yqh_shots">
+            <a class="yqh_shot" href="shots/任务4-图像识别.png" target="_blank">
+                <figure>
+                    <img src="shots/任务4-图像识别.png" alt="图像识别：上传风景图生成中文描述" loading="lazy">
+                    <figcaption>上传雪山峡谷图 → 生成一段准确生动的中文场景描述</figcaption>
+                </figure>
+            </a>
+        </div>
+    </section>
+
+    <!-- 任务五：语音识别 -->
+    <section class="yqh_task">
+        <span class="yqh_no">TASK 05 · 语音识别</span>
+        <h2>AI 语音转文字</h2>
+        <p class="yqh_desc">上传一段 .wav 语音，语音识别模型将其转写为文字，页面提供音频预览播放器与「复制文字」按钮，转写结果「中华美食知识库。」准确无误。</p>
+        <span class="yqh_endpoint">POST http://localhost:8605/api/speech-recognition</span>
+        <div class="yqh_shots">
+            <a class="yqh_shot" href="shots/任务5-语音识别.png" target="_blank">
+                <figure>
+                    <img src="shots/任务5-语音识别.png" alt="语音识别：wav 转文字结果" loading="lazy">
+                    <figcaption>上传 3 秒 wav 音频 → 转写为文字，支持试听与一键复制</figcaption>
+                </figure>
+            </a>
+        </div>
+    </section>
+
+    <p class="yqh_note">作者：尹清华（24002120605）· 课堂实践：AI 能力接入五任务（在线客服 / 多平台切换 / 知识库 RAG / 图像识别 / 语音识别），服务端为 db/ 目录下的 Node.js 服务。</p>
+
+    <!-- 点击放大遮罩层 -->
+    <div class="yqh_lightbox" id="yqh_lightbox">
+        <span class="yqh_tip" id="yqh_lightbox_close">点击任意处关闭 ✕</span>
+        <img id="yqh_lightbox_img" src="" alt="截图放大查看">
+    </div>
+
+    <script>
+        var yqh_lightbox = document.getElementById('yqh_lightbox');
+        var yqh_lightboxImg = document.getElementById('yqh_lightbox_img');
+
+        // yqh_openLightbox：点击截图时拦截跳转，改为在遮罩层中放大显示
+        function yqh_openLightbox(event, src, alt) {
+            event.preventDefault();
+            yqh_lightboxImg.src = src;
+            yqh_lightboxImg.alt = alt;
+            yqh_lightbox.classList.add('yqh_open');
+        }
+
+        // yqh_closeLightbox：关闭遮罩层并清空图片，释放内存
+        function yqh_closeLightbox() {
+            yqh_lightbox.classList.remove('yqh_open');
+            yqh_lightboxImg.src = '';
+        }
+
+        // 给所有截图链接挂放大事件
+        document.querySelectorAll('.yqh_shot').forEach(function (link) {
+            var img = link.querySelector('img');
+            link.addEventListener('click', function (event) {
+                yqh_openLightbox(event, img.src, img.alt);
+            });
+        });
+
+        // 点击遮罩任意处或按 Esc 关闭
+        yqh_lightbox.addEventListener('click', yqh_closeLightbox);
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                yqh_closeLightbox();
+            }
+        });
+    </script>
+</body>
+</html>
