@@ -787,10 +787,23 @@ swiper-task里面的ai提示词也是全部内容
 
 ---
 
-## 2026-11-26 00:00:47 | 模型：GLM-5.3-Flash
+
+---
+
+## 2026-11-27 12:35:15 | 模型：GLM-5.3-Flash
 
 **提示词：**
 
-根据这些生成一个课堂实践测试截图的html文件（附 8 张截图：任务1-在线客服1/2、任务2-多平台切换1/2、任务3-知识库文件上传功/知识库问答、任务4-图像识别、任务5-语音识别）。
+将 d:/高级网页设计/modelscope-guide.html 加入到 index。
 
-**执行说明/执行计划：** 将 8 张截图复制到仓库 shots/ 目录；新建 ai-practice-shots.html 汇总页，按任务一~五分区展示（在线客服、多平台切换、知识库 RAG、图像识别、语音识别），每张截图配说明文字，支持点击放大查看（遮罩层 + Esc 关闭）；index.html 课堂目录补第 15 条入口。
+**执行说明/执行计划：** 在 index.html 课堂目录第 15 条之后新增第 16 条入口（16 / LLM · 魔搭大模型接入指南，链接指向 modelscope-guide.html）。
+
+---
+
+## 2026-11-27 12:39:12 | 模型：GLM-5.3-Flash
+
+**提示词：**
+
+d:/高级网页设计/modelscope-guide.html 请改CSS到这个文件可以用的地方。
+
+**执行说明/执行计划：** 该页引用的 css/yqh_modelscope.css 原本只在子工程 yinqinghua-24002120605/frontend/css/ 里，复制到根目录 css/ 供其使用；页面引用的截图 images/yqh_ms_token_guide.png 同样从子工程复制到根目录 images/；顶栏 / 与 /essay-grading.html 两个绝对路径链接改为 index.html 返回首页与魔搭平台外链。

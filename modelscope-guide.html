@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!--
+  姓名：尹清华 | 学号：24002120605
+  时间：2026-11-27 | 大模型：GLM-5.3-Flash
+  说明：魔搭 ModelScope 大模型接入教学页（仿"大模型应用·全栈接入"课程页结构，
+        内容结合本项目在魔搭平台的真实踩坑经验编写）
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>魔搭 ModelScope 大模型接入指南 · 尹清华 24002120605</title>
+  <link rel="stylesheet" href="css/yqh_modelscope.css">
+</head>
+<body>
+  <div class="yqh_page">
+
+    <!-- 顶栏 -->
+    <nav class="yqh_topbar">
+      <a class="yqh_home" href="index.html">← 返回首页</a>
+      <a href="https://modelscope.cn" target="_blank">前往魔搭平台 ↗</a>
+    </nav>
+
+    <!-- Hero -->
+    <header class="yqh_hero">
+      <div class="yqh_hero_kicker">魔搭 MODELSCOPE · 大模型接入</div>
+      <h1>给你的项目换一把"魔搭钥匙"<br>从领 Key 到 AI 批改作文</h1>
+      <p>魔搭是阿里的开源模型社区，推理 API 与 OpenAI 格式完全兼容。本页结合本项目的<b>真实踩坑记录</b>，带你走完：<strong>领 Key</strong> → <strong>改三个值</strong> → <strong>页面跑通</strong>。</p>
+    </header>
+
+    <!-- 0 架构 -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">0</span>
+        <h2>先看懂全局</h2>
+        <span class="yqh_section_tag">动手前必须明白</span>
+      </div>
+      <p class="yqh_lead">大模型应用落到代码上只有三件事：拿到钥匙（API Key）、把问题发给模型接口、把回答显示到页面上。</p>
+      <div class="yqh_card">
+        <div class="yqh_flow">
+          <span class="yqh_flow_node">你的网页（前端）</span>
+          <span class="yqh_flow_arrow">→</span>
+          <span class="yqh_flow_node">你的后端 /api/*</span>
+          <span class="yqh_flow_arrow">→</span>
+          <span class="yqh_flow_node">魔搭推理接口 api-inference.modelscope.cn</span>
+          <span class="yqh_flow_arrow">→</span>
+          <span class="yqh_flow_arrow">← 答案原路返回</span>
+        </div>
+        <p style="font-size:14.5px;color:var(--yqh_text_sub)">为什么不直接从网页调模型接口？因为请求里必须带 API Key，网页代码按 F12 就能看见。Key 放进前端，等于把家门钥匙贴在门上。</p>
+      </div>
+      <div class="yqh_note yqh_ok">
+        <b>🔑 正确做法</b>
+        Key 只放在后端 <code>.env</code> 里，前端只把请求发给自己的后端，由后端带着 Key 去请求魔搭。
+      </div>
+      <div class="yqh_note yqh_danger">
+        <b>⚠️ 三条红线</b>
+        Key 不写进文档、不提交到 Git（<code>.env</code> 必须在 <code>.gitignore</code> 里）、不截图发群里。展示时一律打码成 <code>ms-****</code>。
+      </div>
+    </section>
+
+    <!-- 1 领 Key -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">1</span>
+        <h2>第一步：领一把魔搭钥匙</h2>
+        <span class="yqh_section_tag">魔搭比其他平台多两道认证</span>
+      </div>
+      <p class="yqh_lead">魔搭的 Key 是 <code>ms-</code> 开头。注册链接：<a href="https://modelscope.cn" target="_blank">https://modelscope.cn</a>。注意：魔搭的推理服务有两道<b>强制认证</b>，漏掉任何一道都会 403。</p>
+      <div class="yqh_steps">
+        <div class="yqh_step">
+          <div class="yqh_step_no">1</div>
+          <div class="yqh_step_body">
+            <h3>注册魔搭账号</h3>
+            <p>用手机号或支付宝直接登录 <a href="https://modelscope.cn" target="_blank">modelscope.cn</a>，右上角头像 → 复制你的账号昵称备用。</p>
+          </div>
+        </div>
+        <div class="yqh_step">
+          <div class="yqh_step_no">2</div>
+          <div class="yqh_step_body">
+            <h3>绑定阿里云账号（第一道认证）</h3>
+            <p>个人中心 →「账号绑定」→ 绑定阿里云账号。不绑定直接报错：<code>Please bind your Alibaba Cloud account before use</code>（403）。</p>
+          </div>
+        </div>
+        <div class="yqh_step">
+          <div class="yqh_step_no">3</div>
+          <div class="yqh_step_body">
+            <h3>完成邮箱验证（第二道认证，最容易漏）</h3>
+            <p>前往 <a href="https://modelscope.cn/my/settings/account" target="_blank">modelscope.cn/my/settings/account</a> 完成邮箱验证。漏掉这步会报错：<code>please complete your profile via email verification</code>（403）。两道认证都过了，推理接口才会放行。</p>
+          </div>
+        </div>
+        <div class="yqh_step">
+          <div class="yqh_step_no">4</div>
+          <div class="yqh_step_body">
+            <h3>新建 API Key 并立刻复制</h3>
+            <p>个人中心 →「访问令牌 / API Key」→ 新建 → <b>立刻复制</b>（<code>ms-</code> 开头）。Key 只显示一次，关掉弹窗就再也看不到原文。</p>
+            <img class="yqh_step_img" src="images/yqh_ms_token_guide.png"
+                 alt="魔搭访问令牌页面：左侧菜单选「访问令牌」，红框处即 API Key，可点击复制或用眼睛图标查看"
+                 loading="lazy">
+            <p class="yqh_step_img_caption">👆 截图指引：左侧菜单选「访问令牌」，红框内就是你的 Key（点击复制按钮，或用眼睛图标临时显示原文）</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 验 Key -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">2</span>
+        <h2>第二步：先验一次 Key 通不通</h2>
+        <span class="yqh_section_tag">强烈建议，能分清是 Key 的问题还是代码的问题</span>
+      </div>
+      <p class="yqh_lead">curl 就是"在命令行里发一个 HTTP 请求"的小工具。先用它测通，再写页面。</p>
+      <div class="yqh_card">
+        <div class="yqh_code">curl --request POST `
+  --url https://api-inference.modelscope.cn/v1/chat/completions `
+  -H <span class="yqh_key">"Authorization: Bearer ms-你的Key"</span> `
+  -H "Content-Type: application/json" `
+  -d "{\"model\":\"Qwen/Qwen3.8-Flash-Next\",\"messages\":[{\"role\":\"user\",\"content\":\"你好，请介绍一下你自己\"}]}"</div>
+        <p style="font-size:14.5px;color:var(--yqh_text_sub)">🪟 Windows 用 PowerShell 时换行符是反引号 <code>`</code>（不是 CMD 的 <code>^</code>）。</p>
+      </div>
+      <div class="yqh_note yqh_ok">
+        <b>✅ 成功长什么样</b>
+        终端返回一大段 JSON，里面有 <code>"content":"你好！我是……"</code> 这样的中文回答，说明 Key 和两道认证都没问题。
+      </div>
+    </section>
+
+    <!-- 3 三件套 -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">3</span>
+        <h2>第三步：抄好"三件套"写进 .env</h2>
+        <span class="yqh_section_tag">换平台只改这三个值</span>
+      </div>
+      <div class="yqh_trio">
+        <div class="yqh_trio_item">
+          <div class="yqh_trio_label">API BaseURL</div>
+          <div class="yqh_trio_value">https://api-inference.modelscope.cn/v1</div>
+        </div>
+        <div class="yqh_trio_item">
+          <div class="yqh_trio_label">Model ID</div>
+          <div class="yqh_trio_value">Qwen/Qwen3.8-Flash-Next</div>
+        </div>
+        <div class="yqh_trio_item">
+          <div class="yqh_trio_label">API Key</div>
+          <div class="yqh_trio_value">ms-你的Key</div>
+        </div>
+      </div>
+      <div class="yqh_card">
+        <div class="yqh_code"><span class="yqh_cmt"># backend/.env（Key 不要加引号、不要有空格）</span>
+MODELSCOPE_API_KEY=<span class="yqh_key">ms-你的Key</span>
+MODELSCOPE_BASE_URL=https://api-inference.modelscope.cn/v1
+MODELSCOPE_MODEL=Qwen/Qwen3.8-Flash-Next</div>
+        <p style="font-size:14.5px;color:var(--yqh_text_sub)">好处：以后换 Key 或换模型只改这一行，代码一行都不用动。</p>
+      </div>
+      <div class="yqh_note yqh_warn">
+        <b>🧠 为什么模型名不要照抄网上的旧教程</b>
+        模型会下架！本项目最初用的 <code>Qwen/Qwen2.5-7B-Instruct</code> 已从魔搭推理服务下架（返回 400 <code>has no provider supported</code>）。拿不准就先查模型列表：<code>GET /v1/models</code>，选一个现役模型。
+      </div>
+    </section>
+
+    <!-- 4 页面 -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">4</span>
+        <h2>第四步：本项目已经跑通的魔搭应用</h2>
+        <span class="yqh_section_tag">按这个顺序验收</span>
+      </div>
+      <div class="yqh_table_wrap">
+        <table class="yqh_table">
+          <tr><th>应用</th><th>页面</th><th>后端接口</th><th>说明</th></tr>
+          <tr>
+            <td>AI 作文批改</td>
+            <td>/essay-grading.html</td>
+            <td>POST /api/essay-grading</td>
+            <td>中文作文（100分制）/ 四级作文与翻译（15分制 6 档，折合 106.5），服务商可选魔搭</td>
+          </tr>
+          <tr>
+            <td>在线客服</td>
+            <td>/customer-service.html</td>
+            <td>POST /api/customer-service</td>
+            <td>客服人设 + 服务商下拉框热切换（硅基流动 / 七牛），同思路可加魔搭</td>
+          </tr>
+          <tr>
+            <td>知识库问答（RAG）</td>
+            <td>/kb-chat.html</td>
+            <td>POST /api/customer-service</td>
+            <td>上传 docx 知识库，检索分块注入提示词后作答</td>
+          </tr>
+          <tr>
+            <td>图像识别</td>
+            <td>/image-recognition.html</td>
+            <td>POST /api/image-recognition</td>
+            <td>走视觉模型（MODELSCOPE_VISION_MODEL）</td>
+          </tr>
+        </table>
+      </div>
+      <div class="yqh_note yqh_ok">
+        <b>🪄 换平台 = 只改三个值</b>
+        魔搭、硅基流动、七牛都兼容 OpenAI 接口格式。把 baseURL / model / apiKey 换成对应平台的值，代码结构完全不动——这就是本项目每个 AI 页面都带"服务商下拉框"的原因。
+      </div>
+    </section>
+
+    <!-- 5 报错速查 -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">5</span>
+        <h2>报错速查表</h2>
+        <span class="yqh_section_tag">全部来自本项目的真实踩坑记录</span>
+      </div>
+      <div class="yqh_table_wrap">
+        <table class="yqh_table">
+          <tr><th>现象</th><th>真正的原因</th><th>怎么解决</th></tr>
+          <tr>
+            <td>403 bind your Alibaba Cloud account</td>
+            <td>没绑定阿里云账号</td>
+            <td>个人中心 → 账号绑定 → 绑定阿里云（免费）</td>
+          </tr>
+          <tr>
+            <td>403 email verification</td>
+            <td>没做邮箱验证（最常漏）</td>
+            <td>modelscope.cn/my/settings/account 完成验证</td>
+          </tr>
+          <tr>
+            <td>400 has no provider supported</td>
+            <td>模型已下架（如 Qwen2.5-7B-Instruct）</td>
+            <td>GET /v1/models 查现役模型，改 .env 的 MODELSCOPE_MODEL</td>
+          </tr>
+          <tr>
+            <td>401</td>
+            <td>Key 错了、少写 Bearer、复制带空格</td>
+            <td>重新复制 Key；请求头 Authorization: Bearer ms-xxx</td>
+          </tr>
+          <tr>
+            <td>429</td>
+            <td>限流，请求太频繁</td>
+            <td>加几百毫秒延迟重试（本项目已内置限流重试）</td>
+          </tr>
+          <tr>
+            <td>页面 CORS 报错</td>
+            <td>前端直接请求了模型接口</td>
+            <td>改走自己的后端 /api/* 转发，Key 顺便藏好</td>
+          </tr>
+          <tr>
+            <td>改了 .env 没生效</td>
+            <td>后端没重启</td>
+            <td>重启后端服务（dotenv 只在启动时读取）</td>
+          </tr>
+        </table>
+      </div>
+      <div class="yqh_note yqh_ok">
+        <b>🧠 排错顺序</b>
+        先 curl 测 Key → 再测自己的后端接口 → 最后看前端。从里往外查，比在页面里瞎改快得多。
+      </div>
+    </section>
+
+    <!-- 6 验收 -->
+    <section class="yqh_section">
+      <div class="yqh_section_head">
+        <span class="yqh_section_no">6</span>
+        <h2>验收清单与课堂任务</h2>
+        <span class="yqh_section_tag">能跑 + 能讲清</span>
+      </div>
+      <ul class="yqh_checklist">
+        <li>Key 只出现在 backend/.env，前端源码、Git 里都搜不到</li>
+        <li>终端 curl 能返回中文回答</li>
+        <li>魔搭两道认证（阿里云绑定 + 邮箱验证）都已完成</li>
+        <li>作文批改页选"魔搭 ModelScope"能正常返回分数与评语</li>
+        <li>故意把 Key 改错一位，页面给出"Key 无效"类友好提示而不是白屏</li>
+        <li>把服务商切回硅基流动，同一个页面照样能用（只改配置）</li>
+      </ul>
+    </section>
+
+    <footer class="yqh_footer">
+      魔搭 ModelScope 大模型接入指南 · 尹清华 24002120605 · 高级网页设计课程作业
+    </footer>
+  </div>
+</body>
+</html>

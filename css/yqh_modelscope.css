@@ -1,0 +1,177 @@
+/*==================================================
+  姓名：尹清华 | 学号：24002120605
+  时间：2026-11-27 | 大模型：GLM-5.3-Flash
+  说明：魔搭 ModelScope 大模型接入教学页样式（纯 CSS）
+==================================================*/
+:root {
+  --yqh_bg: #f7f8fa;
+  --yqh_card: #ffffff;
+  --yqh_text: #1f2329;
+  --yqh_text_sub: #646a73;
+  --yqh_main: #7c3aed;        /* 魔搭紫 */
+  --yqh_main_deep: #5b21b6;
+  --yqh_main_soft: #f3eeff;
+  --yqh_border: #e5e6eb;
+  --yqh_ok_bg: #e8f7ef;
+  --yqh_ok: #0a7d43;
+  --yqh_warn_bg: #fff7e8;
+  --yqh_warn: #a35c00;
+  --yqh_danger_bg: #fdecec;
+  --yqh_danger: #c0392b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  background: var(--yqh_bg);
+  color: var(--yqh_text);
+  line-height: 1.75;
+}
+
+.yqh_page { max-width: 860px; margin: 0 auto; padding: 0 20px 80px; }
+
+/* 顶部导航 */
+.yqh_topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 0;
+}
+.yqh_topbar a {
+  color: var(--yqh_text_sub); text-decoration: none; font-size: 14px;
+}
+.yqh_topbar a:hover { color: var(--yqh_main); }
+
+/* Hero */
+.yqh_hero {
+  background: linear-gradient(135deg, var(--yqh_main_deep), var(--yqh_main));
+  border-radius: 18px; color: #fff;
+  padding: 52px 44px; margin: 10px 0 36px;
+}
+.yqh_hero_kicker {
+  font-size: 13px; letter-spacing: 6px; opacity: .85; margin-bottom: 14px;
+}
+.yqh_hero h1 { font-size: 34px; line-height: 1.3; margin-bottom: 14px; }
+.yqh_hero p { font-size: 16px; opacity: .92; max-width: 620px; }
+.yqh_hero strong { background: rgba(255,255,255,.18); padding: 0 6px; border-radius: 4px; }
+
+/* 章节 */
+.yqh_section { margin-top: 46px; }
+.yqh_section_head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.yqh_section_no {
+  font-size: 30px; font-weight: 700; color: var(--yqh_main);
+  font-family: Georgia, serif;
+}
+.yqh_section_head h2 { font-size: 22px; }
+.yqh_section_head .yqh_section_tag {
+  font-size: 13px; color: var(--yqh_text_sub);
+}
+.yqh_section > p.yqh_lead { color: var(--yqh_text_sub); margin-bottom: 18px; }
+
+/* 卡片 */
+.yqh_card {
+  background: var(--yqh_card); border: 1px solid var(--yqh_border);
+  border-radius: 12px; padding: 22px 24px; margin-top: 16px;
+}
+
+/* 架构流程 */
+.yqh_flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.yqh_flow_node {
+  background: var(--yqh_main_soft); color: var(--yqh_main_deep);
+  border: 1px solid #d9c9ff; border-radius: 8px;
+  padding: 8px 14px; font-size: 14px; font-weight: 600;
+}
+.yqh_flow_arrow { color: var(--yqh_text_sub); font-size: 16px; }
+
+/* 提示框 */
+.yqh_note { border-left: 4px solid; border-radius: 8px; padding: 14px 18px; margin-top: 16px; font-size: 15px; }
+.yqh_note b { display: block; margin-bottom: 4px; }
+.yqh_note.yqh_ok { background: var(--yqh_ok_bg); border-color: var(--yqh_ok); color: var(--yqh_ok); }
+.yqh_note.yqh_warn { background: var(--yqh_warn_bg); border-color: var(--yqh_warn); color: var(--yqh_warn); }
+.yqh_note.yqh_danger { background: var(--yqh_danger_bg); border-color: var(--yqh_danger); color: var(--yqh_danger); }
+
+/* 步骤条 */
+.yqh_steps { margin-top: 18px; display: grid; gap: 14px; }
+.yqh_step {
+  display: flex; gap: 16px;
+  background: var(--yqh_card); border: 1px solid var(--yqh_border);
+  border-radius: 12px; padding: 18px 20px;
+}
+.yqh_step_no {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--yqh_main); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px;
+}
+.yqh_step_body h3 { font-size: 16px; margin-bottom: 6px; }
+.yqh_step_body p, .yqh_step_body li { font-size: 14.5px; color: var(--yqh_text_sub); }
+.yqh_step_body ol { padding-left: 20px; }
+
+/* 步骤配图 */
+.yqh_step_img {
+  display: block; width: 100%; max-width: 560px;
+  border: 1px solid var(--yqh_border); border-radius: 10px;
+  margin: 12px auto 6px;
+}
+.yqh_step_img_caption {
+  text-align: center; font-size: 13px; color: var(--yqh_text_sub);
+  margin-top: 4px;
+}
+
+/* 代码块 */
+.yqh_code {
+  background: #16161f; color: #d6e2ff;
+  border-radius: 10px; padding: 16px 18px; margin: 12px 0;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13.5px; overflow-x: auto; line-height: 1.7;
+  white-space: pre;
+}
+.yqh_code .yqh_cmt { color: #7c8598; }
+.yqh_code .yqh_key { color: #ff9e64; }
+
+/* 表格 */
+.yqh_table_wrap { overflow-x: auto; }
+.yqh_table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 14px; }
+.yqh_table th, .yqh_table td {
+  border: 1px solid var(--yqh_border); padding: 10px 14px; text-align: left;
+}
+.yqh_table th { background: var(--yqh_main_soft); color: var(--yqh_main_deep); white-space: nowrap; }
+.yqh_table td:first-child { white-space: nowrap; font-weight: 600; }
+
+/* 三件套参数卡 */
+.yqh_trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.yqh_trio_item {
+  background: var(--yqh_main_soft); border: 1px solid #d9c9ff;
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+.yqh_trio_item .yqh_trio_label { font-size: 13px; color: var(--yqh_text_sub); }
+.yqh_trio_item .yqh_trio_value {
+  font-family: Consolas, monospace; font-size: 13px;
+  color: var(--yqh_main_deep); font-weight: 700; word-break: break-all;
+  margin-top: 6px;
+}
+
+/* 验收清单 */
+.yqh_checklist { list-style: none; margin-top: 14px; display: grid; gap: 10px; }
+.yqh_checklist li {
+  background: var(--yqh_card); border: 1px solid var(--yqh_border);
+  border-radius: 10px; padding: 12px 16px 12px 44px;
+  font-size: 14.5px; position: relative;
+}
+.yqh_checklist li::before {
+  content: ""; position: absolute; left: 14px; top: 15px;
+  width: 17px; height: 17px; border-radius: 5px;
+  border: 2px solid var(--yqh_main); background: #fff;
+}
+
+/* 页脚 */
+.yqh_footer {
+  margin-top: 60px; text-align: center; color: var(--yqh_text_sub); font-size: 13px;
+}
+
+/* 手机适配 */
+@media (max-width: 640px) {
+  .yqh_hero { padding: 36px 24px; }
+  .yqh_hero h1 { font-size: 25px; }
+  .yqh_trio { grid-template-columns: 1fr; }
+  .yqh_section_head { flex-wrap: wrap; gap: 6px; }
+}
